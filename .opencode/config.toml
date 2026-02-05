@@ -1,0 +1,57 @@
+# OpenCode Configuration for rust-icons
+# Inspired by Anthony Fu's approach to developer tooling
+
+[project]
+name = "rust-icons"
+description = "Rust port of icones for Leptos, Yew, and Dioxus"
+
+[code_style]
+# Anthony Fu inspired defaults
+simplicity = true
+dx_first = true
+type_safety = "strict"
+
+[rust]
+edition = "2021"
+clippy_level = "pedantic"
+format = "rustfmt"
+
+[commands]
+build = "cargo build --workspace"
+test = "cargo test --workspace"
+lint = "cargo clippy --workspace -- -D warnings"
+format = "cargo fmt"
+check = "cargo check --workspace"
+
+[frameworks.leptos]
+dev = "cd crates/leptos-icons && cargo leptos watch"
+build = "cd crates/leptos-icons && cargo leptos build --release"
+
+[frameworks.yew]
+dev = "cd crates/yew-icons && trunk serve"
+build = "cd crates/yew-icons && trunk build --release"
+
+[frameworks.dioxus]
+dev = "cd crates/dioxus-icons && dx serve"
+build = "cd crates/dioxus-icons && dx build --release"
+
+[conventions]
+# File organization
+components_dir = "src/components"
+hooks_dir = "src/hooks"
+utils_dir = "src/utils"
+types_dir = "src/types"
+
+# Naming
+component_suffix = ""  # No suffix, just descriptive names
+test_location = "inline"  # Tests in same file
+
+[principles]
+# From Anthony Fu's philosophy
+rules = [
+    "Simplicity over complexity",
+    "DX matters - developer experience is a feature",
+    "Convention over configuration",
+    "Composable - small, focused, reusable pieces",
+    "Type-safe - leverage the type system fully",
+]
