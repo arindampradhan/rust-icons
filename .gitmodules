@@ -1,0 +1,3 @@
+[submodule "icones"]
+	path = icones
+	url = https://github.com/antfu-collective/icones.git
