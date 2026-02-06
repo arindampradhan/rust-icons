@@ -14,6 +14,7 @@ pub fn IconDetail(prefix: String, name: String, on_close: Callback<()>) -> impl 
     let (svg_html, set_svg_html) = signal(None::<String>);
     let (copied_type, set_copied_type) = signal(None::<String>);
     let (copied_message, set_copied_message) = signal(None::<String>);
+    let (hovered_snippet, set_hovered_snippet) = signal(None::<(SnippetType, String)>);
 
     // Fetch icon data on mount
     {
@@ -70,6 +71,17 @@ pub fn IconDetail(prefix: String, name: String, on_close: Callback<()>) -> impl 
         }
     };
 
+    let on_snippet_hover = move |snippet_type: SnippetType| {
+        if let Some(icon) = icon_data.get() {
+            let snippet = snippets::generate(&icon, snippet_type);
+            set_hovered_snippet.set(Some((snippet_type, snippet)));
+        }
+    };
+
+    let on_snippet_leave = move || {
+        set_hovered_snippet.set(None);
+    };
+
     let icon_id_display = icon_id.clone();
     let prefix_clone = prefix.clone();
 
@@ -83,6 +95,28 @@ pub fn IconDetail(prefix: String, name: String, on_close: Callback<()>) -> impl 
             <Show when=move || copied_message.get().is_some()>
                 <div class="copied-toast">
                     {move || copied_message.get().unwrap_or_default()}
+                </div>
+            </Show>
+
+            // Code preview popup
+            <Show when=move || hovered_snippet.get().is_some()>
+                <div class="code-preview-popup">
+                    {move || {
+                        hovered_snippet.get().map(|(snippet_type, code)| {
+                            let highlighted = highlight_code(&code, snippet_type);
+                            view! {
+                                <div class="code-preview-header">
+                                    {snippet_type.name()}
+                                </div>
+                                <pre class="code-preview-content">
+                                    <code 
+                                        class=format!("language-{}", get_language_class(snippet_type))
+                                        inner_html=highlighted
+                                    />
+                                </pre>
+                            }
+                        })
+                    }}
                 </div>
             </Show>
 
@@ -105,12 +139,16 @@ pub fn IconDetail(prefix: String, name: String, on_close: Callback<()>) -> impl 
                         types.into_iter().map(|snippet_type| {
                             let is_copied = copied.as_ref().is_some_and(|c| c == snippet_type.name());
                             let copy_fn = copy_snippet;
+                            let hover_fn = on_snippet_hover;
+                            let leave_fn = on_snippet_leave;
 
                             view! {
                                 <button
                                     class="snippet-btn"
                                     class:copied=is_copied
                                     on:click=move |_| copy_fn(snippet_type)
+                                    on:mouseenter=move |_| hover_fn(snippet_type)
+                                    on:mouseleave=move |_| leave_fn()
                                 >
                                     {snippet_type.name()}
                                     {snippet_type.tag().map(|tag| view! {
@@ -139,12 +177,16 @@ pub fn IconDetail(prefix: String, name: String, on_close: Callback<()>) -> impl 
                         types.into_iter().map(|snippet_type| {
                             let is_copied = copied.as_ref().is_some_and(|c| c == snippet_type.name());
                             let copy_fn = copy_snippet;
+                            let hover_fn = on_snippet_hover;
+                            let leave_fn = on_snippet_leave;
 
                             view! {
                                 <button
                                     class="snippet-btn"
                                     class:copied=is_copied
                                     on:click=move |_| copy_fn(snippet_type)
+                                    on:mouseenter=move |_| hover_fn(snippet_type)
+                                    on:mouseleave=move |_| leave_fn()
                                 >
                                     {snippet_type.name()}
                                     {snippet_type.tag().map(|tag| view! {
@@ -215,6 +257,31 @@ pub fn IconDetail(prefix: String, name: String, on_close: Callback<()>) -> impl 
             </div>
         </div>
     }
+}
+
+fn get_language_class(snippet_type: SnippetType) -> &'static str {
+    match snippet_type {
+        SnippetType::Leptos | SnippetType::Yew | SnippetType::Dioxus => "rust",
+        SnippetType::Svg | SnippetType::SvgSymbol => "xml",
+        SnippetType::DataUrl | SnippetType::Url | SnippetType::Base64 => "text",
+        SnippetType::Iconify => "json",
+        SnippetType::CssBackground => "css",
+        SnippetType::Jsx | SnippetType::React => "jsx",
+        SnippetType::ReactTs | SnippetType::Qwik | SnippetType::Solid => "tsx",
+        SnippetType::Vue => "vue",
+        SnippetType::VueTs => "typescript",
+        SnippetType::Svelte => "svelte",
+        SnippetType::Astro => "astro",
+    }
+}
+
+fn highlight_code(code: &str, _snippet_type: SnippetType) -> String {
+    // Simple HTML escape for safety
+    code
+        .replace('&', "&amp;")
+        .replace('<', "&lt;")
+        .replace('>', "&gt;")
+        .replace('"', "&quot;")
 }
 
 #[component]
