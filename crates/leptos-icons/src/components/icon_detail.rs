@@ -1,6 +1,7 @@
 use leptos::prelude::*;
 use rust_icons_core::snippets::{self, SnippetCategory, SnippetType};
 use rust_icons_core::types::ResolvedIcon;
+use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use wasm_bindgen_futures::spawn_local;
 
@@ -12,7 +13,7 @@ pub fn IconDetail(prefix: String, name: String, on_close: Callback<()>) -> impl 
     let (icon_data, set_icon_data) = signal(None::<ResolvedIcon>);
     let (svg_html, set_svg_html) = signal(None::<String>);
     let (copied_type, set_copied_type) = signal(None::<String>);
-    let (active_tab, set_active_tab) = signal(SnippetCategory::Rust);
+    let (copied_message, set_copied_message) = signal(None::<String>);
 
     // Fetch icon data on mount
     {
@@ -41,11 +42,31 @@ pub fn IconDetail(prefix: String, name: String, on_close: Callback<()>) -> impl 
 
             let type_name = snippet_type.name().to_string();
             set_copied_type.set(Some(type_name.clone()));
+            set_copied_message.set(Some(format!("Copied {}!", type_name)));
 
-            spawn_local(async move {
-                gloo_net::http::Request::get("data:,").send().await.ok();
-                set_copied_type.set(None);
-            });
+            // Clear the button indicator after a short delay
+            if let Some(window) = web_sys::window() {
+                let closure = Closure::once(move || {
+                    set_copied_type.set(None);
+                });
+                let _ = window.set_timeout_with_callback_and_timeout_and_arguments_0(
+                    closure.as_ref().unchecked_ref(),
+                    800,
+                );
+                closure.forget();
+            }
+
+            // Clear the message after 2 seconds
+            if let Some(window) = web_sys::window() {
+                let closure = Closure::once(move || {
+                    set_copied_message.set(None);
+                });
+                let _ = window.set_timeout_with_callback_and_timeout_and_arguments_0(
+                    closure.as_ref().unchecked_ref(),
+                    2000,
+                );
+                closure.forget();
+            }
         }
     };
 
@@ -58,6 +79,13 @@ pub fn IconDetail(prefix: String, name: String, on_close: Callback<()>) -> impl 
                 "\u{00d7}"
             </button>
 
+            // Copied message toast
+            <Show when=move || copied_message.get().is_some()>
+                <div class="copied-toast">
+                    {move || copied_message.get().unwrap_or_default()}
+                </div>
+            </Show>
+
             // Icon preview
             <div class="preview-section">
                 <div class="preview-svg" inner_html=move || {
@@ -66,124 +94,126 @@ pub fn IconDetail(prefix: String, name: String, on_close: Callback<()>) -> impl 
                 <div class="icon-id">{icon_id_display}</div>
             </div>
 
-            // Category tabs
-            <div class="snippet-tabs">
-                <SnippetTab
-                    category=SnippetCategory::Rust
-                    label="Rust"
-                    active_tab=active_tab
-                    set_active_tab=set_active_tab
-                />
-                <SnippetTab
-                    category=SnippetCategory::Snippets
-                    label="Snippets"
-                    active_tab=active_tab
-                    set_active_tab=set_active_tab
-                />
-                <SnippetTab
-                    category=SnippetCategory::Links
-                    label="Links"
-                    active_tab=active_tab
-                    set_active_tab=set_active_tab
-                />
+            // Rust snippets section
+            <div class="detail-section">
+                <div class="section-label">"Rust Components"</div>
+                <div class="snippet-buttons">
+                    {move || {
+                        let types = SnippetType::by_category(SnippetCategory::Rust);
+                        let copied = copied_type.get();
+
+                        types.into_iter().map(|snippet_type| {
+                            let is_copied = copied.as_ref().is_some_and(|c| c == snippet_type.name());
+                            let copy_fn = copy_snippet;
+
+                            view! {
+                                <button
+                                    class="snippet-btn"
+                                    class:copied=is_copied
+                                    on:click=move |_| copy_fn(snippet_type)
+                                >
+                                    {snippet_type.name()}
+                                    {snippet_type.tag().map(|tag| view! {
+                                        <sup class="tag">{tag}</sup>
+                                    })}
+                                    {if is_copied {
+                                        Some(view! { <span class="copied-indicator">" ✓"</span> })
+                                    } else {
+                                        None
+                                    }}
+                                </button>
+                            }
+                        }).collect_view()
+                    }}
+                </div>
             </div>
 
-            // Snippet buttons
-            <div class="snippet-buttons">
-                {move || {
-                    let tab = active_tab.get();
-                    let types = SnippetType::by_category(tab);
-                    let copied = copied_type.get();
+            // Snippets section
+            <div class="detail-section">
+                <div class="section-label">"Snippets"</div>
+                <div class="snippet-buttons">
+                    {move || {
+                        let types = SnippetType::by_category(SnippetCategory::Snippets);
+                        let copied = copied_type.get();
 
-                    types.into_iter().map(|snippet_type| {
-                        let is_copied = copied.as_ref().is_some_and(|c| c == snippet_type.name());
-                        let copy_fn = copy_snippet;
+                        types.into_iter().map(|snippet_type| {
+                            let is_copied = copied.as_ref().is_some_and(|c| c == snippet_type.name());
+                            let copy_fn = copy_snippet;
 
-                        view! {
-                            <button
-                                class="snippet-btn"
-                                class:copied=is_copied
-                                on:click=move |_| copy_fn(snippet_type)
-                            >
-                                {snippet_type.name()}
-                                {snippet_type.tag().map(|tag| view! {
-                                    <sup class="tag">{tag}</sup>
-                                })}
-                                {if is_copied {
-                                    Some(view! { <span class="copied-indicator">" ✓"</span> })
-                                } else {
-                                    None
-                                }}
-                            </button>
-                        }
-                    }).collect_view()
-                }}
+                            view! {
+                                <button
+                                    class="snippet-btn"
+                                    class:copied=is_copied
+                                    on:click=move |_| copy_fn(snippet_type)
+                                >
+                                    {snippet_type.name()}
+                                    {snippet_type.tag().map(|tag| view! {
+                                        <sup class="tag">{tag}</sup>
+                                    })}
+                                    {if is_copied {
+                                        Some(view! { <span class="copied-indicator">" ✓"</span> })
+                                    } else {
+                                        None
+                                    }}
+                                </button>
+                            }
+                        }).collect_view()
+                    }}
+                </div>
             </div>
 
             // Download section
-            <div class="download-section">
+            <div class="detail-section">
                 <div class="section-label">"Download"</div>
                 <div class="download-buttons">
                     <DownloadButton
                         icon_data=icon_data
                         snippet_type=SnippetType::Svg
                         ext="svg"
+                        set_copied_message=set_copied_message
                     />
                     <DownloadButton
                         icon_data=icon_data
                         snippet_type=SnippetType::Leptos
                         ext="rs"
+                        set_copied_message=set_copied_message
                     />
                     <DownloadButton
                         icon_data=icon_data
                         snippet_type=SnippetType::Yew
                         ext="rs"
+                        set_copied_message=set_copied_message
                     />
                     <DownloadButton
                         icon_data=icon_data
                         snippet_type=SnippetType::Dioxus
                         ext="rs"
+                        set_copied_message=set_copied_message
                     />
                 </div>
             </div>
 
-            // View on external sites
-            <div class="external-links">
-                <div class="section-label">"View on"</div>
-                <a
-                    class="external-link"
-                    href=format!("https://icon-sets.iconify.design/{prefix_clone}/?icon-filter={name}")
-                    target="_blank"
-                >
-                    "Iconify"
-                </a>
-                <a
-                    class="external-link"
-                    href=format!("https://uno.antfu.me/?s=i-{prefix}-{name}", prefix=prefix.clone(), name=name.clone())
-                    target="_blank"
-                >
-                    "UnoCSS"
-                </a>
+            // Links section
+            <div class="detail-section">
+                <div class="section-label">"Links"</div>
+                <div class="external-links">
+                    <a
+                        class="external-link"
+                        href=format!("https://icon-sets.iconify.design/{prefix_clone}/?icon-filter={name}")
+                        target="_blank"
+                    >
+                        "Iconify"
+                    </a>
+                    <a
+                        class="external-link"
+                        href=format!("https://uno.antfu.me/?s=i-{prefix}-{name}", prefix=prefix.clone(), name=name.clone())
+                        target="_blank"
+                    >
+                        "UnoCSS"
+                    </a>
+                </div>
             </div>
         </div>
-    }
-}
-
-#[component]
-fn SnippetTab(
-    category: SnippetCategory,
-    label: &'static str,
-    active_tab: ReadSignal<SnippetCategory>,
-    set_active_tab: WriteSignal<SnippetCategory>,
-) -> impl IntoView {
-    view! {
-        <button
-            class="tab-btn"
-            class:active=move || active_tab.get() == category
-            on:click=move |_| set_active_tab.set(category)
-        >
-            {label}
-        </button>
     }
 }
 
@@ -192,6 +222,7 @@ fn DownloadButton(
     icon_data: ReadSignal<Option<ResolvedIcon>>,
     snippet_type: SnippetType,
     ext: &'static str,
+    set_copied_message: WriteSignal<Option<String>>,
 ) -> impl IntoView {
     let download = move |_| {
         if let Some(icon) = icon_data.get() {
@@ -216,6 +247,21 @@ fn DownloadButton(
             a.set_attribute("download", &filename).unwrap();
             a.dyn_ref::<web_sys::HtmlElement>().unwrap().click();
             web_sys::Url::revoke_object_url(&url).unwrap();
+
+            // Show download message
+            set_copied_message.set(Some(format!("Downloaded {}!", filename)));
+
+            // Clear the message after 2 seconds
+            if let Some(window) = web_sys::window() {
+                let closure = Closure::once(move || {
+                    set_copied_message.set(None);
+                });
+                let _ = window.set_timeout_with_callback_and_timeout_and_arguments_0(
+                    closure.as_ref().unchecked_ref(),
+                    2000,
+                );
+                closure.forget();
+            }
         }
     };
 

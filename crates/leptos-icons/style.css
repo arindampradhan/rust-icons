@@ -318,33 +318,135 @@ a {
     color: var(--primary);
 }
 
-/* ── Modal ───────────────────────────────────── */
-.modal-overlay {
+/* ── Bottom Drawer ───────────────────────────────────── */
+.drawer-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: rgba(0, 0, 0, 0);
     z-index: 1000;
-    padding: 1rem;
+    pointer-events: none;
+    transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(0px);
 }
 
-.modal-content {
-    background: var(--bg);
-    border-radius: calc(var(--radius) * 1.5);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-    max-width: 500px;
+.drawer-overlay.open {
+    background: rgba(0, 0, 0, 0.4);
+    pointer-events: auto;
+    backdrop-filter: blur(4px);
+}
+
+.drawer-content {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
     width: 100%;
-    max-height: 90vh;
+    background: var(--bg);
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.15);
+    max-height: 85vh;
     overflow-y: auto;
-    position: relative;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: auto;
+}
+
+.drawer-overlay.open .drawer-content {
+    transform: translateY(0);
+}
+
+.drawer-handle {
+    display: flex;
+    justify-content: center;
+    padding: 0.75rem 0;
+    cursor: grab;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+}
+
+.drawer-handle:active {
+    cursor: grabbing;
+}
+
+.drawer-handle::before {
+    content: '';
+    width: 40px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    transition: background-color 0.15s;
+}
+
+.drawer-handle:hover::before {
+    background: var(--text-secondary);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 640px) {
+    .drawer-content {
+        max-height: 90vh;
+        border-radius: 20px 20px 0 0;
+    }
+}
+
+@media (min-width: 768px) {
+    .drawer-content {
+        max-width: 600px;
+        left: 50%;
+        right: auto;
+        width: 100%;
+        transform: translateX(-50%) translateY(100%);
+    }
+    
+    .drawer-overlay.open .drawer-content {
+        transform: translateX(-50%) translateY(0);
+    }
 }
 
 /* ── Icon Detail ─────────────────────────────── */
 .icon-detail {
-    padding: 2rem;
+    padding: 0 2rem 2rem;
     text-align: center;
+    position: relative;
+}
+
+.icon-detail .copied-toast {
+    position: absolute;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #10b981;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    z-index: 100;
+    animation: slideDownFade 0.3s ease-out;
+    pointer-events: none;
+}
+
+@keyframes slideDownFade {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+/* Add responsive positioning */
+@media (max-width: 640px) {
+    .icon-detail .copied-toast {
+        top: 0.5rem;
+        font-size: 0.8125rem;
+        padding: 0.375rem 0.875rem;
+    }
 }
 
 .icon-detail .preview-svg {
@@ -397,8 +499,8 @@ a {
 
 .icon-detail .close-btn {
     position: absolute;
-    top: 0.75rem;
-    right: 0.75rem;
+    top: 1rem;
+    right: 1rem;
     background: none;
     border: none;
     font-size: 1.25rem;
@@ -406,6 +508,7 @@ a {
     cursor: pointer;
     padding: 0.25rem;
     line-height: 1;
+    z-index: 10;
 }
 
 .icon-detail .close-btn:hover {
@@ -436,42 +539,31 @@ a {
     margin-bottom: 1.5rem;
 }
 
-.icon-detail .snippet-tabs {
-    display: flex;
-    gap: 0.25rem;
-    justify-content: center;
-    margin-bottom: 1rem;
-    flex-wrap: wrap;
+.icon-detail .detail-section {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
 }
 
-.icon-detail .tab-btn {
-    padding: 0.375rem 0.75rem;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    background: var(--bg);
-    color: var(--text-secondary);
-    font-size: 0.75rem;
-    cursor: pointer;
-    transition: all 0.15s;
+.icon-detail .detail-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
 }
 
-.icon-detail .tab-btn:hover {
-    border-color: var(--primary);
-    color: var(--primary);
-}
-
-.icon-detail .tab-btn.active {
-    background: var(--primary);
-    border-color: var(--primary);
-    color: white;
+.icon-detail .section-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 0.75rem;
+    text-align: left;
 }
 
 .icon-detail .snippet-buttons {
     display: flex;
     gap: 0.375rem;
-    justify-content: center;
+    justify-content: flex-start;
     flex-wrap: wrap;
-    margin-bottom: 1.5rem;
 }
 
 .icon-detail .snippet-btn {
@@ -509,18 +601,6 @@ a {
     font-size: 0.75rem;
 }
 
-.icon-detail .section-label {
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-    margin-bottom: 0.5rem;
-    text-align: left;
-}
-
-.icon-detail .download-section {
-    margin-bottom: 1rem;
-    text-align: left;
-}
-
 .icon-detail .download-buttons {
     display: flex;
     gap: 0.375rem;
@@ -544,8 +624,9 @@ a {
 }
 
 .icon-detail .external-links {
-    margin-bottom: 1.5rem;
-    text-align: left;
+    display: flex;
+    gap: 0.375rem;
+    flex-wrap: wrap;
 }
 
 .icon-detail .external-link {
@@ -554,100 +635,12 @@ a {
     border: 1px solid var(--border);
     border-radius: 6px;
     font-size: 0.75rem;
-    margin-right: 0.375rem;
     transition: all 0.15s;
 }
 
 .icon-detail .external-link:hover {
     border-color: var(--primary);
     color: var(--primary);
-}
-
-.icon-detail .install-section {
-    text-align: left;
-    border-top: 1px solid var(--border);
-    padding-top: 1rem;
-}
-
-.icon-detail .install-header {
-    display: block;
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-    margin-bottom: 0.75rem;
-    transition: color 0.15s;
-}
-
-.icon-detail .install-header:hover {
-    color: var(--primary);
-}
-
-.icon-detail .pm-selector {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 0.75rem;
-}
-
-.icon-detail .pm-btn {
-    padding: 0.25rem 0.5rem;
-    border: none;
-    background: none;
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-    cursor: pointer;
-    opacity: 0.5;
-    transition: opacity 0.15s;
-}
-
-.icon-detail .pm-btn:hover,
-.icon-detail .pm-btn.active {
-    opacity: 1;
-}
-
-.icon-detail .pm-btn.active {
-    color: var(--primary);
-}
-
-.icon-detail .install-command {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 0.75rem;
-    background: #1e1e1e;
-    border-radius: 6px;
-    font-size: 0.75rem;
-}
-
-.icon-detail .install-command code {
-    flex: 1;
-    font-family: "SF Mono", "Fira Code", monospace;
-}
-
-.icon-detail .install-command .cmd-pm {
-    color: #80a665;
-}
-
-.icon-detail .install-command .cmd-action {
-    color: #b8a965;
-}
-
-.icon-detail .install-command .cmd-package {
-    color: #c98a7d;
-}
-
-.icon-detail .copy-cmd-btn {
-    padding: 0.25rem 0.5rem;
-    border: 1px solid #444;
-    border-radius: 4px;
-    background: transparent;
-    color: #888;
-    font-size: 0.625rem;
-    cursor: pointer;
-    transition: all 0.15s;
-}
-
-.icon-detail .copy-cmd-btn:hover {
-    border-color: #666;
-    color: #ccc;
 }
 
 /* ── Utility ─────────────────────────────────── */
@@ -660,4 +653,43 @@ a {
     overflow: hidden;
     clip: rect(0, 0, 0, 0);
     border: 0;
+}
+
+/* ── Animations ──────────────────────────────── */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(0);
+    }
+    to {
+        transform: translateY(100%);
+    }
+}
+
+/* Smooth scrolling for drawer content */
+.drawer-content {
+    scroll-behavior: smooth;
+    overscroll-behavior: contain;
+}
+
+/* Prevent body scroll when drawer is open */
+body.drawer-open {
+    overflow: hidden;
 }

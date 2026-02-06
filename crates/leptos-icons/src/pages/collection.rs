@@ -5,7 +5,7 @@ use rust_icons_core::search::filter_icons;
 use crate::api;
 use crate::components::icon_detail::IconDetail;
 use crate::components::icon_grid::IconGrid;
-use crate::components::modal::Modal;
+use crate::components::BottomDrawer;
 use crate::components::navbar::Navbar;
 use crate::components::search_bar::SearchBar;
 
@@ -75,13 +75,13 @@ pub fn CollectionPage() -> impl IntoView {
                                         let icon_name = selected_icon.get().unwrap_or_default();
                                         let prefix = prefix_for_detail.clone();
                                         view! {
-                                            <Modal on_close=Callback::new(move |()| set_selected_icon.set(None))>
+                                            <BottomDrawer on_close=Callback::new(move |()| set_selected_icon.set(None))>
                                                 <IconDetail
                                                     prefix=prefix
                                                     name=icon_name
                                                     on_close=Callback::new(move |()| set_selected_icon.set(None))
                                                 />
-                                            </Modal>
+                                            </BottomDrawer>
                                         }
                                     }
                                 </Show>

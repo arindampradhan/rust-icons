@@ -5,3 +5,5 @@ pub mod icon_grid;
 pub mod modal;
 pub mod navbar;
 pub mod search_bar;
+
+pub use modal::BottomDrawer;
