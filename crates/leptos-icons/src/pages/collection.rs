@@ -75,11 +75,11 @@ pub fn CollectionPage() -> impl IntoView {
                                         let icon_name = selected_icon.get().unwrap_or_default();
                                         let prefix = prefix_for_detail.clone();
                                         view! {
-                                            <Modal on_close=Callback::new(move |_| set_selected_icon.set(None))>
+                                            <Modal on_close=Callback::new(move |()| set_selected_icon.set(None))>
                                                 <IconDetail
                                                     prefix=prefix
                                                     name=icon_name
-                                                    on_close=Callback::new(move |_| set_selected_icon.set(None))
+                                                    on_close=Callback::new(move |()| set_selected_icon.set(None))
                                                 />
                                             </Modal>
                                         }

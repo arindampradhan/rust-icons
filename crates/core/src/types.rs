@@ -52,6 +52,7 @@ pub struct CollectionInfo {
 
 impl CollectionInfo {
     /// Build from the raw API response entry.
+    #[must_use]
     pub fn from_raw(id: String, raw: CollectionInfoRaw) -> Self {
         Self {
             id,
@@ -96,6 +97,7 @@ pub struct CollectionResponse {
 
 impl CollectionResponse {
     /// Get all visible icon names (uncategorized + categorized, deduplicated).
+    #[must_use]
     pub fn all_icon_names(&self) -> Vec<String> {
         let mut names: std::collections::HashSet<String> =
             self.uncategorized.iter().cloned().collect();
@@ -128,6 +130,7 @@ pub struct ResolvedIcon {
 
 impl ResolvedIcon {
     /// Resolve an icon from the collection response, falling back to set-level defaults.
+    #[must_use]
     pub fn from_response(resp: &IconifyResponse, name: &str) -> Option<Self> {
         let data = resp.icons.get(name)?;
         Some(Self {

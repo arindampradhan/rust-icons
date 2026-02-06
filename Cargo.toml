@@ -4,3 +4,10 @@ members = ["crates/core", "crates/leptos-icons"]
 
 [workspace.dependencies]
 serde = { version = "1", features = ["derive"] }
+
+[workspace.lints.clippy]
+pedantic = { level = "warn", priority = -1 }
+# Leptos components require owned values for reactivity
+needless_pass_by_value = "allow"
+# Large view! macros are common in UI components
+too_many_lines = "allow"

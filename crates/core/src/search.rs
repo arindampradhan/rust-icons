@@ -3,6 +3,7 @@ use crate::types::CollectionInfo;
 /// Case-insensitive substring filter for collections.
 ///
 /// Matches against collection name, ID, and category.
+#[must_use]
 pub fn filter_collections<'a>(
     collections: &'a [CollectionInfo],
     query: &str,
@@ -22,6 +23,7 @@ pub fn filter_collections<'a>(
 }
 
 /// Case-insensitive substring filter for icon names.
+#[must_use]
 pub fn filter_icons<'a>(icons: &'a [String], query: &str) -> Vec<&'a String> {
     if query.is_empty() {
         return icons.iter().collect();

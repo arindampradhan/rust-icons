@@ -3,6 +3,9 @@ name = "leptos-icons"
 version = "0.1.0"
 edition = "2021"
 
+[lints]
+workspace = true
+
 [dependencies]
 rust-icons-core = { path = "../core" }
 leptos = { version = "0.7", features = ["csr"] }

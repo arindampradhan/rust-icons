@@ -53,6 +53,7 @@ pub enum SnippetType {
 
 impl SnippetType {
     /// Display name for UI.
+    #[must_use]
     pub fn name(&self) -> &'static str {
         match self {
             Self::Svg => "SVG",
@@ -62,10 +63,8 @@ impl SnippetType {
             Self::Leptos => "Leptos",
             Self::Yew => "Yew",
             Self::Dioxus => "Dioxus",
-            Self::Vue => "Vue",
-            Self::VueTs => "Vue",
-            Self::React => "React",
-            Self::ReactTs => "React",
+            Self::Vue | Self::VueTs => "Vue",
+            Self::React | Self::ReactTs => "React",
             Self::Svelte => "Svelte",
             Self::Qwik => "Qwik",
             Self::Solid => "Solid",
@@ -78,6 +77,7 @@ impl SnippetType {
     }
 
     /// Optional tag suffix (e.g., "TS" for TypeScript variants).
+    #[must_use]
     pub fn tag(&self) -> Option<&'static str> {
         match self {
             Self::VueTs | Self::ReactTs => Some("TS"),
@@ -86,6 +86,7 @@ impl SnippetType {
     }
 
     /// Category for grouping in UI.
+    #[must_use]
     pub fn category(&self) -> SnippetCategory {
         match self {
             Self::Svg | Self::SvgSymbol | Self::Iconify | Self::Jsx => SnippetCategory::Snippets,
@@ -105,6 +106,7 @@ impl SnippetType {
     }
 
     /// All snippet types for iteration.
+    #[must_use]
     pub fn all() -> &'static [Self] {
         &[
             Self::Svg,
@@ -130,6 +132,7 @@ impl SnippetType {
     }
 
     /// Snippet types by category.
+    #[must_use]
     pub fn by_category(category: SnippetCategory) -> Vec<Self> {
         Self::all()
             .iter()
@@ -139,7 +142,7 @@ impl SnippetType {
     }
 }
 
-/// Convert icon name to PascalCase component name.
+/// Convert icon name to `PascalCase` component name.
 ///
 /// # Example
 /// ```
@@ -147,6 +150,7 @@ impl SnippetType {
 /// assert_eq!(to_component_name("arrow-left"), "ArrowLeft");
 /// assert_eq!(to_component_name("mdi:home"), "MdiHome");
 /// ```
+#[must_use]
 pub fn to_component_name(icon: &str) -> String {
     icon.split([':', '-', '_'])
         .filter(|s| !s.is_empty())
@@ -161,12 +165,14 @@ pub fn to_component_name(icon: &str) -> String {
 }
 
 /// Clean SVG by keeping only essential attributes.
+#[must_use]
 pub fn clean_svg(svg: &str) -> String {
     // Simple regex-free cleanup: keep viewBox, xmlns
     svg.to_string()
 }
 
 /// Generate a snippet for the given type.
+#[must_use]
 pub fn generate(icon: &ResolvedIcon, snippet_type: SnippetType) -> String {
     let svg = crate::svg::build_svg(icon);
     let component_name = to_component_name(&format!("{}:{}", icon.prefix, icon.name));
@@ -180,7 +186,7 @@ pub fn generate(icon: &ResolvedIcon, snippet_type: SnippetType) -> String {
             icon_id, icon.width, icon.height, icon.body
         ),
 
-        SnippetType::Iconify => format!(r#"<span class="iconify" data-icon="{}"></span>"#, icon_id),
+        SnippetType::Iconify => format!(r#"<span class="iconify" data-icon="{icon_id}"></span>"#),
 
         SnippetType::Jsx => format!(
             r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {} {}" width={{size}} height={{size}} {{...props}}>{}</svg>"#,
@@ -219,7 +225,7 @@ pub fn generate(icon: &ResolvedIcon, snippet_type: SnippetType) -> String {
 
 fn generate_leptos(icon: &ResolvedIcon, name: &str) -> String {
     format!(
-        r##"use leptos::prelude::*;
+        r#"use leptos::prelude::*;
 
 #[component]
 pub fn {name}(
@@ -238,7 +244,7 @@ pub fn {name}(
             {body}
         </svg>
     }}
-}}"##,
+}}"#,
         name = name,
         w = icon.width,
         h = icon.height,
@@ -248,7 +254,7 @@ pub fn {name}(
 
 fn generate_yew(icon: &ResolvedIcon, name: &str) -> String {
     format!(
-        r##"use yew::prelude::*;
+        r#"use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct Props {{
@@ -272,7 +278,7 @@ pub fn {name}(props: &Props) -> Html {{
             {body}
         </svg>
     }}
-}}"##,
+}}"#,
         name = name,
         w = icon.width,
         h = icon.height,
@@ -285,7 +291,7 @@ fn generate_dioxus(icon: &ResolvedIcon, name: &str) -> String {
     let rsx_body = svg_body_to_dioxus_rsx(&icon.body);
 
     format!(
-        r##"use dioxus::prelude::*;
+        r#"use dioxus::prelude::*;
 
 #[component]
 pub fn {name}(
@@ -303,7 +309,7 @@ pub fn {name}(
             {rsx_body}
         }}
     }}
-}}"##,
+}}"#,
         name = name,
         w = icon.width,
         h = icon.height,
@@ -555,6 +561,7 @@ fn svg_body_to_jsx(body: &str) -> String {
 // =============================================================================
 
 /// Encode SVG to Base64.
+#[must_use]
 pub fn svg_to_base64(svg: &str) -> String {
     base64_encode(svg.as_bytes())
 }
@@ -593,6 +600,7 @@ fn base64_encode(input: &[u8]) -> String {
 }
 
 /// Encode SVG to data URL (chooses shorter of base64 or URL-encoded).
+#[must_use]
 pub fn svg_to_data_url(svg: &str) -> String {
     let base64 = format!("data:image/svg+xml;base64,{}", svg_to_base64(svg));
     let url_encoded = format!("data:image/svg+xml,{}", encode_svg_for_css(svg));
@@ -604,7 +612,7 @@ pub fn svg_to_data_url(svg: &str) -> String {
     }
 }
 
-/// Encode SVG for use in CSS url().
+/// Encode SVG for use in CSS `url()`.
 fn encode_svg_for_css(svg: &str) -> String {
     svg.replace('#', "%23")
         .replace('<', "%3C")

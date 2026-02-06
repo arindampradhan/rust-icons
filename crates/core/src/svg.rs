@@ -1,6 +1,7 @@
 use crate::types::ResolvedIcon;
 
 /// Build a complete SVG string from a resolved icon.
+#[must_use]
 pub fn build_svg(icon: &ResolvedIcon) -> String {
     format!(
         r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {} {}" width="{}" height="{}">{}</svg>"#,
@@ -9,6 +10,7 @@ pub fn build_svg(icon: &ResolvedIcon) -> String {
 }
 
 /// URL for the Iconify CDN SVG endpoint.
+#[must_use]
 pub fn iconify_svg_url(prefix: &str, name: &str) -> String {
     format!("https://api.iconify.design/{prefix}/{name}.svg")
 }
@@ -16,6 +18,7 @@ pub fn iconify_svg_url(prefix: &str, name: &str) -> String {
 /// URL for the Iconify CDN to use in `<img>` tags.
 ///
 /// Provides a smaller, pre-rendered SVG that's ideal for grid thumbnails.
+#[must_use]
 pub fn iconify_img_url(prefix: &str, name: &str) -> String {
     format!("https://api.iconify.design/{prefix}/{name}.svg?height=1.2em")
 }

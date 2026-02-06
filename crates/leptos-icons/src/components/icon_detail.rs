@@ -81,12 +81,6 @@ pub fn IconDetail(prefix: String, name: String, on_close: Callback<()>) -> impl 
                     set_active_tab=set_active_tab
                 />
                 <SnippetTab
-                    category=SnippetCategory::Components
-                    label="Components"
-                    active_tab=active_tab
-                    set_active_tab=set_active_tab
-                />
-                <SnippetTab
                     category=SnippetCategory::Links
                     label="Links"
                     active_tab=active_tab
@@ -102,7 +96,7 @@ pub fn IconDetail(prefix: String, name: String, on_close: Callback<()>) -> impl 
                     let copied = copied_type.get();
 
                     types.into_iter().map(|snippet_type| {
-                        let is_copied = copied.as_ref().map(|c| c == snippet_type.name()).unwrap_or(false);
+                        let is_copied = copied.as_ref().is_some_and(|c| c == snippet_type.name());
                         let copy_fn = copy_snippet;
 
                         view! {
@@ -171,9 +165,6 @@ pub fn IconDetail(prefix: String, name: String, on_close: Callback<()>) -> impl 
                     "UnoCSS"
                 </a>
             </div>
-
-            // Install iconset
-            <InstallIconset prefix=prefix.clone() />
         </div>
     }
 }
@@ -232,85 +223,5 @@ fn DownloadButton(
         <button class="download-btn" on:click=download>
             {snippet_type.name()}
         </button>
-    }
-}
-
-#[component]
-fn InstallIconset(prefix: String) -> impl IntoView {
-    let (selected_pm, set_selected_pm) = signal("pnpm");
-    let (copied, set_copied) = signal(false);
-
-    let package_managers = [
-        ("pnpm", "pnpm add -D"),
-        ("npm", "npm i -D"),
-        ("yarn", "yarn add -D"),
-        ("bun", "bun add -D"),
-    ];
-
-    let copy_command = {
-        let prefix = prefix.clone();
-        move |_| {
-            let pm = selected_pm.get();
-            let cmd = match pm {
-                "npm" => "npm i -D",
-                "yarn" => "yarn add -D",
-                "bun" => "bun add -D",
-                _ => "pnpm add -D",
-            };
-            let command = format!("{cmd} @iconify-json/{prefix}");
-
-            let window = web_sys::window().unwrap();
-            let clipboard = window.navigator().clipboard();
-            let _ = clipboard.write_text(&command);
-
-            set_copied.set(true);
-            spawn_local(async move {
-                gloo_net::http::Request::get("data:,").send().await.ok();
-                set_copied.set(false);
-            });
-        }
-    };
-
-    view! {
-        <div class="install-section">
-            <a
-                class="install-header"
-                href="https://iconify.design/docs/icons/json.html"
-                target="_blank"
-            >
-                "Install Iconify Iconset"
-            </a>
-
-            <div class="pm-selector">
-                {package_managers.iter().map(|(pm, _)| {
-                    let pm = *pm;
-                    view! {
-                        <button
-                            class="pm-btn"
-                            class:active=move || selected_pm.get() == pm
-                            on:click=move |_| set_selected_pm.set(pm)
-                        >
-                            {pm}
-                        </button>
-                    }
-                }).collect_view()}
-            </div>
-
-            <div class="install-command">
-                <code>
-                    <span class="cmd-pm">{move || selected_pm.get()}</span>
-                    <span class="cmd-action">{move || {
-                        match selected_pm.get() {
-                            "npm" => " i -D ",
-                            _ => " add -D ",
-                        }
-                    }}</span>
-                    <span class="cmd-package">"@iconify-json/"{prefix.clone()}</span>
-                </code>
-                <button class="copy-cmd-btn" on:click=copy_command>
-                    {move || if copied.get() { "✓" } else { "Copy" }}
-                </button>
-            </div>
-        </div>
     }
 }
