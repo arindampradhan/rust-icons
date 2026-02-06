@@ -431,6 +431,225 @@ a {
     margin-bottom: 0.5rem;
 }
 
+/* ── Icon Detail Enhanced ───────────────────── */
+.icon-detail .preview-section {
+    margin-bottom: 1.5rem;
+}
+
+.icon-detail .snippet-tabs {
+    display: flex;
+    gap: 0.25rem;
+    justify-content: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.icon-detail .tab-btn {
+    padding: 0.375rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.icon-detail .tab-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.icon-detail .tab-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.icon-detail .snippet-buttons {
+    display: flex;
+    gap: 0.375rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+
+.icon-detail .snippet-btn {
+    padding: 0.375rem 0.625rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.125rem;
+}
+
+.icon-detail .snippet-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.icon-detail .snippet-btn.copied {
+    background: #10b981;
+    border-color: #10b981;
+    color: white;
+}
+
+.icon-detail .snippet-btn .tag {
+    font-size: 0.625rem;
+    opacity: 0.6;
+    margin-left: 0.125rem;
+}
+
+.icon-detail .snippet-btn .copied-indicator {
+    font-size: 0.75rem;
+}
+
+.icon-detail .section-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    text-align: left;
+}
+
+.icon-detail .download-section {
+    margin-bottom: 1rem;
+    text-align: left;
+}
+
+.icon-detail .download-buttons {
+    display: flex;
+    gap: 0.375rem;
+    flex-wrap: wrap;
+}
+
+.icon-detail .download-btn {
+    padding: 0.375rem 0.625rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.icon-detail .download-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.icon-detail .external-links {
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+
+.icon-detail .external-link {
+    display: inline-block;
+    padding: 0.375rem 0.625rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.75rem;
+    margin-right: 0.375rem;
+    transition: all 0.15s;
+}
+
+.icon-detail .external-link:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.icon-detail .install-section {
+    text-align: left;
+    border-top: 1px solid var(--border);
+    padding-top: 1rem;
+}
+
+.icon-detail .install-header {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+    transition: color 0.15s;
+}
+
+.icon-detail .install-header:hover {
+    color: var(--primary);
+}
+
+.icon-detail .pm-selector {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.icon-detail .pm-btn {
+    padding: 0.25rem 0.5rem;
+    border: none;
+    background: none;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.15s;
+}
+
+.icon-detail .pm-btn:hover,
+.icon-detail .pm-btn.active {
+    opacity: 1;
+}
+
+.icon-detail .pm-btn.active {
+    color: var(--primary);
+}
+
+.icon-detail .install-command {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: #1e1e1e;
+    border-radius: 6px;
+    font-size: 0.75rem;
+}
+
+.icon-detail .install-command code {
+    flex: 1;
+    font-family: "SF Mono", "Fira Code", monospace;
+}
+
+.icon-detail .install-command .cmd-pm {
+    color: #80a665;
+}
+
+.icon-detail .install-command .cmd-action {
+    color: #b8a965;
+}
+
+.icon-detail .install-command .cmd-package {
+    color: #c98a7d;
+}
+
+.icon-detail .copy-cmd-btn {
+    padding: 0.25rem 0.5rem;
+    border: 1px solid #444;
+    border-radius: 4px;
+    background: transparent;
+    color: #888;
+    font-size: 0.625rem;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.icon-detail .copy-cmd-btn:hover {
+    border-color: #666;
+    color: #ccc;
+}
+
 /* ── Utility ─────────────────────────────────── */
 .sr-only {
     position: absolute;
