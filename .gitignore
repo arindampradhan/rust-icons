@@ -1,0 +1,35 @@
+# Rust / Cargo
+target/
+Cargo.lock
+**/*.rs.bk
+
+# Leptos
+site/
+pkg/
+dist/
+
+# WASM build artifacts
+*.wasm
+*.wasm.d
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+
+# Debug
+debug/
