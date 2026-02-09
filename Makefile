@@ -1,4 +1,4 @@
-.PHONY: help fmt check lint test build clean dev
+.PHONY: help fmt check lint test build clean dev serve
 
 help: ## Show this help message
 	@echo "Available commands:"
@@ -22,7 +22,10 @@ build: ## Build all crates in release mode
 clean: ## Clean build artifacts
 	cargo clean
 
-dev: ## Development mode - check formatting and run clippy
+dev: ## Start Trunk dev server for leptos-icons (port 4000)
+	cd crates/leptos-icons && trunk serve
+
+precheck: ## Run formatting, linting, and tests
 	@echo "Checking formatting..."
 	@cargo fmt --all -- --check
 	@echo "Running clippy..."
@@ -31,4 +34,4 @@ dev: ## Development mode - check formatting and run clippy
 	@cargo test --workspace --all-features
 	@echo "✓ All checks passed!"
 
-ci: dev ## Run CI checks locally (same as dev)
+ci: precheck ## Run CI checks locally (same as precheck)

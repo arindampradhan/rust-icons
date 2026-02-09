@@ -1,4 +1,5 @@
 use leptos::prelude::*;
+use rust_icons_core::search::search_collections;
 use rust_icons_core::types::CollectionInfo;
 
 use crate::api;
@@ -25,14 +26,10 @@ pub fn HomePage() -> impl IntoView {
                 {move || Suspend::new(async move {
                     match collections.await {
                         Ok(all_collections) => {
-                            let search = search;
-                            let grouped = move || {
-                                let q = search.get().to_lowercase();
-                                let filtered: Vec<&CollectionInfo> = if q.is_empty() {
-                                    all_collections.iter().collect()
-                                } else {
-                                    rust_icons_core::search::filter_collections(&all_collections, &q)
-                                };
+                            // Use Signal::derive to properly track the search signal reactively
+                            let grouped = Signal::derive(move || {
+                                let filtered: Vec<&CollectionInfo> =
+                                    search_collections(&all_collections, &search.get());
 
                                 // Group by category
                                 let mut categories: Vec<(String, Vec<CollectionInfo>)> = Vec::new();
@@ -45,11 +42,11 @@ pub fn HomePage() -> impl IntoView {
                                 }
                                 categories.sort_by(|a, b| a.0.cmp(&b.0));
                                 categories
-                            };
+                            });
 
                             view! {
                                 <For
-                                    each=grouped
+                                    each=move || grouped.get()
                                     key=|(cat, _)| cat.clone()
                                     let:entry
                                 >

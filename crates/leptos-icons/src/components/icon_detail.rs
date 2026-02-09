@@ -43,7 +43,7 @@ pub fn IconDetail(prefix: String, name: String, on_close: Callback<()>) -> impl 
             set_copied_type.set(Some(type_name.clone()));
 
             spawn_local(async move {
-                gloo_net::http::Request::get("data:,").send().await.ok();
+                gloo_timers::future::TimeoutFuture::new(2_000).await;
                 set_copied_type.set(None);
             });
         }

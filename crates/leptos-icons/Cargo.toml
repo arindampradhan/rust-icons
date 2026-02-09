@@ -11,6 +11,7 @@ rust-icons-core = { path = "../core" }
 leptos = { version = "0.7", features = ["csr"] }
 leptos_router = { version = "0.7" }
 gloo-net = { version = "0.6", features = ["http", "json"] }
+gloo-timers = { version = "0.3", features = ["futures"] }
 serde = { workspace = true }
 web-sys = { version = "0.3", features = [
     "Window",

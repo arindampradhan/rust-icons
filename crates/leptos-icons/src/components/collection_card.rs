@@ -15,10 +15,16 @@ pub fn CollectionCard(collection: CollectionInfo) -> impl IntoView {
         .as_ref()
         .map(|l| l.title.clone())
         .unwrap_or_default();
-    let total = collection.total;
-    let name = collection.name.clone();
-    let prefix = collection.id.clone();
-    let samples = collection.samples.clone();
+
+    let CollectionInfo {
+        id,
+        name,
+        total,
+        samples,
+        author: _,
+        license: _,
+        ..
+    } = collection;
 
     view! {
         <a class="collection-card" href=href>
@@ -32,7 +38,7 @@ pub fn CollectionCard(collection: CollectionInfo) -> impl IntoView {
             </div>
             <div class="card-samples">
                 {samples.into_iter().take(3).map(|icon_name| {
-                    let url = iconify_img_url(&prefix, &icon_name);
+                    let url = iconify_img_url(&id, &icon_name);
                     view! { <img src=url alt="" loading="lazy" /> }
                 }).collect::<Vec<_>>()}
             </div>

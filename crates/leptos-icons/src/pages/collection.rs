@@ -1,6 +1,6 @@
 use leptos::prelude::*;
 use leptos_router::hooks::use_params_map;
-use rust_icons_core::search::filter_icons;
+use rust_icons_core::search::search_icons;
 
 use crate::api;
 use crate::components::icon_detail::IconDetail;
@@ -37,15 +37,7 @@ pub fn CollectionPage() -> impl IntoView {
                             let all_icons = icon_names.clone();
 
                             let filtered_icons = Signal::derive(move || {
-                                let q = search.get();
-                                if q.is_empty() {
-                                    all_icons.clone()
-                                } else {
-                                    filter_icons(&all_icons, &q)
-                                        .into_iter()
-                                        .cloned()
-                                        .collect()
-                                }
+                                search_icons(&all_icons, &search.get())
                             });
 
                             let prefix_for_grid = prefix.clone();
