@@ -18,6 +18,9 @@ pub fn CollectionPage() -> impl IntoView {
         async move { api::fetch_collection_icons(&prefix).await }
     });
 
+    // Sidebar title: shows full name once loaded, prefix as fallback
+    let (sidebar_name, set_sidebar_name) = signal(initial_id.clone());
+
     let (search, set_search) = signal(String::new());
     let (selected_icon, set_selected_icon) = signal(None::<String>);
 
@@ -32,7 +35,7 @@ pub fn CollectionPage() -> impl IntoView {
                             <polyline points="12 19 5 12 12 5"></polyline>
                         </svg>
                     </a>
-                    <h1 class="sidebar-title">{initial_id.clone()}</h1>
+                    <h1 class="sidebar-title">{move || sidebar_name.get()}</h1>
                 </div>
 
                 <div class="sidebar-search">
@@ -73,6 +76,26 @@ pub fn CollectionPage() -> impl IntoView {
                                 let total = icon_names.len();
                                 let all_icons = icon_names.clone();
 
+                                // Extract collection metadata
+                                let display_name = resp.info.as_ref()
+                                    .map(|i| i.name.clone())
+                                    .or(resp.title.clone())
+                                    .unwrap_or_else(|| prefix.clone());
+                                set_sidebar_name.set(display_name.clone());
+                                let author_name = resp.info.as_ref()
+                                    .and_then(|i| i.author.as_ref())
+                                    .map(|a| format!("@{}", a.name));
+                                let license_spdx = resp.info.as_ref()
+                                    .and_then(|i| i.license.as_ref())
+                                    .map(|l| l.spdx.clone().unwrap_or_else(|| l.title.clone()));
+
+                                let meta_parts: Vec<String> = [
+                                    author_name,
+                                    license_spdx,
+                                    Some(format!("{total} icons")),
+                                ].into_iter().flatten().collect();
+                                let meta_line = meta_parts.join(" · ");
+
                                 // Reactive search
                                 let filtered_icons = Signal::derive(move || {
                                     search_icons(&all_icons, &search.get())
@@ -101,9 +124,9 @@ pub fn CollectionPage() -> impl IntoView {
                                 view! {
                                     <header class="collection-detail-header">
                                         <div class="collection-title-group">
-                                            <h2 class="collection-title">{prefix.clone()}</h2>
+                                            <h2 class="collection-title">{display_name}</h2>
                                             <div class="collection-subtitle">
-                                                {format!("{} icons", total)}
+                                                {meta_line}
                                             </div>
                                         </div>
 
