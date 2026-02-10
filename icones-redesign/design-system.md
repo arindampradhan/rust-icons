@@ -1,4 +1,4 @@
-# Design System: The Daily Icon
+# Design System: Rust Icons
 
 This design system is inspired by traditional newspaper aesthetics, focusing on typography, structured layouts, and a clean, high-contrast reading experience.
 

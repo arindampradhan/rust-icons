@@ -25,7 +25,7 @@ const Design_Daily = () => {
           
           <Link to="/" className="block">
             <h1 className="text-6xl md:text-8xl font-black font-serif tracking-tight mb-2 hover:opacity-80 transition-opacity">
-              The Daily Icon
+              Rust Icons
             </h1>
           </Link>
           

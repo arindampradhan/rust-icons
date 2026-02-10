@@ -34,15 +34,15 @@ pub fn CollectionPage() -> impl IntoView {
                     </a>
                     <h1 class="font-serif font-bold text-xl truncate">{initial_id.clone()}</h1>
                 </div>
-                
+
                 <div class="p-4 border-b border-black bg-white">
                     <div class="relative">
                         <div class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                         </div>
-                        <input 
-                           type="text" 
-                           placeholder="Search collections..." 
+                        <input
+                           type="text"
+                           placeholder="Search collections..."
                            class="w-full bg-gray-50 border border-gray-200 py-2 pl-9 pr-2 text-sm focus:outline-none focus:border-black font-sans"
                         />
                     </div>
@@ -58,7 +58,7 @@ pub fn CollectionPage() -> impl IntoView {
                 </div>
 
                 <div class="p-4 border-t border-black text-xs font-sans text-center text-gray-500">
-                    "© 2026 Icônes"
+                    "© 2026 Rust Icons"
                 </div>
             </aside>
 
@@ -82,7 +82,7 @@ pub fn CollectionPage() -> impl IntoView {
                                 let grouped_icons = Signal::derive(move || {
                                     let icons = filtered_icons.get();
                                     let mut groups: Vec<(String, Vec<String>)> = Vec::new();
-                                    
+
                                     for icon in icons {
                                         let first_char = icon.chars().next().unwrap_or('?').to_uppercase().to_string();
                                         if let Some(group) = groups.iter_mut().find(|(key, _)| key == &first_char) {
@@ -156,9 +156,9 @@ pub fn CollectionPage() -> impl IntoView {
                                                                     let name_clone = icon_name.clone();
                                                                     let p = prefix_for_inner.clone();
                                                                     let img_url = iconify_img_url(&p, &icon_name);
-                                                                    
+
                                                                     view! {
-                                                                        <button 
+                                                                        <button
                                                                             class="icon-item group"
                                                                             on:click=move |_| set_selected_icon.set(Some(name_clone.clone()))
                                                                         >
@@ -179,20 +179,20 @@ pub fn CollectionPage() -> impl IntoView {
                                             </div>
                                         </For>
                                     </div>
-                                    
+
                                     // ── Drawer ───────────────────────────────────────
                                     {move || {
                                         let is_open = selected_icon.get().is_some();
                                         let current_icon = selected_icon.get().unwrap_or_default();
                                         let p = prefix_for_drawer.clone();
-                                        
+
                                         view! {
                                             <div class=format!("drawer {}", if is_open { "open" } else { "" })>
                                                 <Show when=move || is_open>
-                                                    <IconDetail 
+                                                    <IconDetail
                                                         prefix=p.clone()
                                                         name=current_icon.clone()
-                                                        on_close=Callback::new(move |_| set_selected_icon.set(None)) 
+                                                        on_close=Callback::new(move |_| set_selected_icon.set(None))
                                                     />
                                                 </Show>
                                             </div>

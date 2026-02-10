@@ -15,7 +15,7 @@ const Home = () => {
           <div className="absolute top-0 right-0 bg-yellow-500 text-black text-xs font-bold px-2 py-1">#1</div>
           <div className="flex flex-col items-center gap-4 mb-2 text-center">
              <Newspaper size={32} className="text-gray-200" />
-             <h2 className="text-lg font-semibold leading-tight">The Daily Icon</h2>
+             <h2 className="text-lg font-semibold leading-tight">Rust Icons</h2>
           </div>
         </Link>
 

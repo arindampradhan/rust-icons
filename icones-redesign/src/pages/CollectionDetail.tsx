@@ -9,7 +9,7 @@ const CollectionDetail = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedIcon, setSelectedIcon] = useState<any>(null);
 
-  // Group icons by first letter for "The Daily Icon" style categories
+  // Group icons by first letter for "Rust Icons" style categories
   const groupedIcons = icons.filter(icon =>
     icon.name.toLowerCase().includes(searchTerm.toLowerCase())
   ).reduce((acc, icon) => {

@@ -17,12 +17,12 @@ pub fn HomePage() -> impl IntoView {
                 <header class="masthead">
                     <div class="masthead-meta">
                         <span>"Vol. CCLVI No. 104"</span>
-                        <span class="flex items-center gap-2">"Icônes"</span>
+                        <span class="flex items-center gap-2">Rust Icons | Daily Edition</span>
                         <span>"$4.00"</span>
                     </div>
 
-                    <h1 class="masthead-title">"The Daily Icon"</h1>
-                    <div class="font-serif italic text-lg mb-6">"All the icons that are fit to print."</div>
+                    // <h1 class="masthead-title">"Rust Icons"</h1>
+                    // <div class="font-serif italic text-lg mb-6">"All the icons that are fit to print."</div>
 
                     <div class="search-wrapper max-w-2xl mx-auto">
                         <input
