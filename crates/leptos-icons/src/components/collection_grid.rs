@@ -4,6 +4,7 @@ use rust_icons_core::types::CollectionInfo;
 use super::collection_card::CollectionCard;
 
 #[component]
+#[allow(dead_code)]
 pub fn CollectionGrid(collections: Vec<CollectionInfo>) -> impl IntoView {
     view! {
         <div class="collection-grid">

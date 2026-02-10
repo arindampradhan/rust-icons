@@ -323,7 +323,7 @@ pub fn CollectionPage() -> impl IntoView {
                                                     <IconDetail
                                                         prefix=p.clone()
                                                         name=current_icon.clone()
-                                                        on_close=Callback::new(move |_| set_selected_icon.set(None))
+                                                        on_close=Callback::new(move |()| set_selected_icon.set(None))
                                                     />
                                                 </Show>
                                             </div>

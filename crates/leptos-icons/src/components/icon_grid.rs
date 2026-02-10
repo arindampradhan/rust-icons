@@ -4,6 +4,7 @@ use rust_icons_core::svg::iconify_img_url;
 const PAGE_SIZE: usize = 200;
 
 #[component]
+#[allow(dead_code)]
 pub fn IconGrid(
     prefix: String,
     icons: Signal<Vec<String>>,

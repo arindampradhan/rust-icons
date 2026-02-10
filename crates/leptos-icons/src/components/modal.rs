@@ -1,6 +1,7 @@
 use leptos::prelude::*;
 
 #[component]
+#[allow(dead_code)]
 pub fn Modal(on_close: Callback<()>, children: Children) -> impl IntoView {
     let on_overlay_click = move |_| {
         on_close.run(());
