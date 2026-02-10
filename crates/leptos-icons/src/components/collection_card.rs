@@ -5,42 +5,39 @@ use rust_icons_core::types::CollectionInfo;
 #[component]
 pub fn CollectionCard(collection: CollectionInfo) -> impl IntoView {
     let href = format!("/collection/{}", collection.id);
-    let author_name = collection
-        .author
-        .as_ref()
-        .map(|a| a.name.clone())
-        .unwrap_or_default();
-    let license_title = collection
+
+    // Fallback if license is missing
+    let license_spdx = collection
         .license
         .as_ref()
-        .map(|l| l.title.clone())
-        .unwrap_or_default();
+        .and_then(|l| l.spdx.clone())
+        .unwrap_or_else(|| "Unknown".to_string());
 
     let CollectionInfo {
-        id,
-        name,
-        total,
-        samples,
-        author: _,
-        license: _,
-        ..
+        id, name, total, ..
     } = collection;
 
+    // Use the first sample icon for the preview, or a default if none
+    let preview_url = iconify_img_url(
+        &id,
+        &collection.samples.first().cloned().unwrap_or_default(),
+    );
+
     view! {
-        <a class="collection-card" href=href>
-            <div class="card-info">
-                <div class="card-name">{name}</div>
-                <div class="card-meta">
-                    <span>{author_name}</span>
-                    <span>{license_title}</span>
-                    <span>{total} " icons"</span>
-                </div>
+        <a href=href class="icon-card group">
+            <div class="card-header">
+                <h3 class="card-title">{name}</h3>
+                <div class="card-badge">"SVG"</div>
             </div>
-            <div class="card-samples">
-                {samples.into_iter().take(3).map(|icon_name| {
-                    let url = iconify_img_url(&id, &icon_name);
-                    view! { <img src=url alt="" loading="lazy" /> }
-                }).collect::<Vec<_>>()}
+
+            <div class="card-preview">
+                <div class="preview-pattern"></div>
+                <img src=preview_url alt=id.clone() loading="lazy" />
+            </div>
+
+            <div class="card-footer">
+                <span>{total} " icons"</span>
+                <span class="uppercase tracking-widest">{license_spdx}</span>
             </div>
         </a>
     }

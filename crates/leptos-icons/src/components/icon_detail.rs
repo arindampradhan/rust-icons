@@ -12,14 +12,15 @@ pub fn IconDetail(prefix: String, name: String, on_close: Callback<()>) -> impl 
     let (icon_data, set_icon_data) = signal(None::<ResolvedIcon>);
     let (svg_html, set_svg_html) = signal(None::<String>);
     let (copied_type, set_copied_type) = signal(None::<String>);
-    let (active_tab, set_active_tab) = signal(SnippetCategory::Rust);
 
-    // Fetch icon data on mount
-    {
-        let prefix = prefix.clone();
-        let name = name.clone();
+    // Fetch icon data on mount or when name changes
+    let prefix_clone = prefix.clone();
+    let name_clone = name.clone();
+    Effect::new(move || {
+        let p = prefix_clone.clone();
+        let n = name_clone.clone();
         spawn_local(async move {
-            match api::fetch_icon_data(&prefix, &name).await {
+            match api::fetch_icon_data(&p, &n).await {
                 Ok(icon) => {
                     let svg = rust_icons_core::svg::build_svg(&icon);
                     set_svg_html.set(Some(svg));
@@ -30,7 +31,7 @@ pub fn IconDetail(prefix: String, name: String, on_close: Callback<()>) -> impl 
                 }
             }
         });
-    }
+    });
 
     let copy_snippet = move |snippet_type: SnippetType| {
         if let Some(icon) = icon_data.get() {
@@ -48,159 +49,14 @@ pub fn IconDetail(prefix: String, name: String, on_close: Callback<()>) -> impl 
             });
         }
     };
-
-    let icon_id_display = icon_id.clone();
-    let prefix_clone = prefix.clone();
-
-    view! {
-        <div class="icon-detail">
-            <button class="close-btn" on:click=move |_| on_close.run(())>
-                "\u{00d7}"
-            </button>
-
-            // Icon preview
-            <div class="preview-section">
-                <div class="preview-svg" inner_html=move || {
-                    svg_html.get().unwrap_or_else(|| "Loading...".to_string())
-                } />
-                <div class="icon-id">{icon_id_display}</div>
-            </div>
-
-            // Category tabs
-            <div class="snippet-tabs">
-                <SnippetTab
-                    category=SnippetCategory::Rust
-                    label="Rust"
-                    active_tab=active_tab
-                    set_active_tab=set_active_tab
-                />
-                <SnippetTab
-                    category=SnippetCategory::Snippets
-                    label="Snippets"
-                    active_tab=active_tab
-                    set_active_tab=set_active_tab
-                />
-                <SnippetTab
-                    category=SnippetCategory::Links
-                    label="Links"
-                    active_tab=active_tab
-                    set_active_tab=set_active_tab
-                />
-            </div>
-
-            // Snippet buttons
-            <div class="snippet-buttons">
-                {move || {
-                    let tab = active_tab.get();
-                    let types = SnippetType::by_category(tab);
-                    let copied = copied_type.get();
-
-                    types.into_iter().map(|snippet_type| {
-                        let is_copied = copied.as_ref().is_some_and(|c| c == snippet_type.name());
-                        let copy_fn = copy_snippet;
-
-                        view! {
-                            <button
-                                class="snippet-btn"
-                                class:copied=is_copied
-                                on:click=move |_| copy_fn(snippet_type)
-                            >
-                                {snippet_type.name()}
-                                {snippet_type.tag().map(|tag| view! {
-                                    <sup class="tag">{tag}</sup>
-                                })}
-                                {if is_copied {
-                                    Some(view! { <span class="copied-indicator">" ✓"</span> })
-                                } else {
-                                    None
-                                }}
-                            </button>
-                        }
-                    }).collect_view()
-                }}
-            </div>
-
-            // Download section
-            <div class="download-section">
-                <div class="section-label">"Download"</div>
-                <div class="download-buttons">
-                    <DownloadButton
-                        icon_data=icon_data
-                        snippet_type=SnippetType::Svg
-                        ext="svg"
-                    />
-                    <DownloadButton
-                        icon_data=icon_data
-                        snippet_type=SnippetType::Leptos
-                        ext="rs"
-                    />
-                    <DownloadButton
-                        icon_data=icon_data
-                        snippet_type=SnippetType::Yew
-                        ext="rs"
-                    />
-                    <DownloadButton
-                        icon_data=icon_data
-                        snippet_type=SnippetType::Dioxus
-                        ext="rs"
-                    />
-                </div>
-            </div>
-
-            // View on external sites
-            <div class="external-links">
-                <div class="section-label">"View on"</div>
-                <a
-                    class="external-link"
-                    href=format!("https://icon-sets.iconify.design/{prefix_clone}/?icon-filter={name}")
-                    target="_blank"
-                >
-                    "Iconify"
-                </a>
-                <a
-                    class="external-link"
-                    href=format!("https://uno.antfu.me/?s=i-{prefix}-{name}", prefix=prefix.clone(), name=name.clone())
-                    target="_blank"
-                >
-                    "UnoCSS"
-                </a>
-            </div>
-        </div>
-    }
-}
-
-#[component]
-fn SnippetTab(
-    category: SnippetCategory,
-    label: &'static str,
-    active_tab: ReadSignal<SnippetCategory>,
-    set_active_tab: WriteSignal<SnippetCategory>,
-) -> impl IntoView {
-    view! {
-        <button
-            class="tab-btn"
-            class:active=move || active_tab.get() == category
-            on:click=move |_| set_active_tab.set(category)
-        >
-            {label}
-        </button>
-    }
-}
-
-#[component]
-fn DownloadButton(
-    icon_data: ReadSignal<Option<ResolvedIcon>>,
-    snippet_type: SnippetType,
-    ext: &'static str,
-) -> impl IntoView {
-    let download = move |_| {
+    
+    // Helper for download
+    let download = move |snippet_type: SnippetType, ext: &'static str| {
         if let Some(icon) = icon_data.get() {
             let content = snippets::generate(&icon, snippet_type);
-            let component_name =
-                snippets::to_component_name(&format!("{}:{}", icon.prefix, icon.name));
+            let component_name = snippets::to_component_name(&format!("{}:{}", icon.prefix, icon.name));
             let filename = format!("{component_name}.{ext}");
 
-            // Create blob and download
             let bag = web_sys::BlobPropertyBag::new();
             bag.set_type("text/plain");
             let blob = web_sys::Blob::new_with_str_sequence_and_options(
@@ -220,8 +76,103 @@ fn DownloadButton(
     };
 
     view! {
-        <button class="download-btn" on:click=download>
-            {snippet_type.name()}
-        </button>
+        <div class="drawer-content h-full flex">
+            // ── Large Preview (Left) ─────────────────────────
+            <div class="drawer-preview">
+                <div class="absolute top-4 left-4 font-sans text-xs font-bold bg-white px-2 py-1 border border-black">
+                    "PREVIEW"
+                </div>
+                <div class="scale-[2.0]" inner_html=move || {
+                    svg_html.get().unwrap_or_else(|| "Loading...".to_string())
+                } />
+            </div>
+
+            // ── Details (Right) ──────────────────────────────
+            <div class="drawer-details flex flex-col h-full">
+                <div class="flex justify-between items-center mb-8 border-b border-gray-200 pb-4">
+                    <h3 class="text-3xl font-black font-serif">{name.clone()}</h3>
+                    <button 
+                        class="p-2 hover:bg-gray-200 rounded-full transition-colors"
+                        on:click=move |_| on_close.run(())
+                    >
+                        // Close Icon (X)
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+
+                <div class="flex-1 overflow-y-auto space-y-8">
+                    // Actions
+                    <div>
+                        <h4 class="font-sans font-bold text-xs uppercase tracking-widest border-b border-black mb-4 pb-1">"Actions"</h4>
+                        <div class="flex gap-4 flex-wrap">
+                            <button 
+                                class="flex items-center gap-2 bg-black text-white px-4 py-2 font-sans font-bold text-sm hover:bg-[#b91c1c] transition-colors"
+                                on:click=move |_| copy_snippet(SnippetType::Svg)
+                            >
+                                {move || if copied_type.get().as_deref() == Some("SVG") { "Copied!" } else { "Copy SVG" }}
+                            </button>
+                            <button 
+                                class="flex items-center gap-2 border border-black px-4 py-2 font-sans font-bold text-sm hover:bg-gray-50 transition-colors"
+                                on:click=move |_| copy_snippet(SnippetType::Jsx)
+                            >
+                                {move || if copied_type.get().as_deref() == Some("JSX") { "Copied!" } else { "Copy JSX" }}
+                            </button>
+                            <button 
+                                class="flex items-center gap-2 border border-black px-4 py-2 font-sans font-bold text-sm hover:bg-gray-50 transition-colors"
+                                on:click=move |_| download(SnippetType::Svg, "svg")
+                            >
+                                "Download SVG"
+                            </button>
+                        </div>
+                    </div>
+
+                    // Snippets Grid
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="font-sans font-bold text-xs uppercase tracking-widest border-b border-black mb-4 pb-1">"Component"</h4>
+                            <div class="space-y-2">
+                                <div 
+                                    class="font-mono text-xs bg-gray-50 p-3 border border-gray-200 truncate cursor-pointer hover:border-black"
+                                    on:click=move |_| copy_snippet(SnippetType::Leptos)
+                                >
+                                    {format!("<{} />", snippets::to_component_name(&icon_id))}
+                                </div>
+                                <div class="font-sans text-xs text-gray-400 mt-1">"Click to copy Leptos component"</div>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-sans font-bold text-xs uppercase tracking-widest border-b border-black mb-4 pb-1">"Import"</h4>
+                             <div 
+                                class="font-mono text-xs bg-gray-50 p-3 border border-gray-200 truncate cursor-pointer hover:border-black"
+                                on:click=move |_| copy_snippet(SnippetType::Leptos) // Usually import is part of the snippet or same action
+                            >
+                                {format!("use {}::*;", prefix)}
+                            </div>
+                        </div>
+                    </div>
+
+                    // Links
+                    <div>
+                        <h4 class="font-sans font-bold text-xs uppercase tracking-widest border-b border-black mb-4 pb-1">"Links"</h4>
+                        <div class="flex gap-2">
+                             <a
+                                class="px-3 py-1 border border-gray-300 text-xs font-sans hover:border-black hover:text-black transition-colors"
+                                href=format!("https://icon-sets.iconify.design/{}/?icon-filter={}", prefix, name)
+                                target="_blank"
+                            >
+                                "Iconify"
+                            </a>
+                            <a
+                                class="px-3 py-1 border border-gray-300 text-xs font-sans hover:border-black hover:text-black transition-colors"
+                                href=format!("https://uno.antfu.me/?s=i-{}-{}", prefix, name)
+                                target="_blank"
+                            >
+                                "UnoCSS"
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     }
 }
