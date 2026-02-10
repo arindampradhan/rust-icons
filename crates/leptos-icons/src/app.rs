@@ -8,11 +8,13 @@ use crate::pages::home::HomePage;
 #[component]
 pub fn App() -> impl IntoView {
     view! {
-        <Router>
-            <Routes fallback=|| view! { <div class="loading">"Page not found."</div> }>
-                <Route path=path!("/") view=HomePage />
-                <Route path=path!("/collection/:id") view=CollectionPage />
-            </Routes>
-        </Router>
+        <div class="paper-container">
+            <Router>
+                <Routes fallback=|| view! { <div class="loading">"Page not found."</div> }>
+                    <Route path=path!("/") view=HomePage />
+                    <Route path=path!("/collection/:id") view=CollectionPage />
+                </Routes>
+            </Router>
+        </div>
     }
 }

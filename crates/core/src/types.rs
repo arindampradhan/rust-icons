@@ -85,6 +85,7 @@ pub struct CollectionResponse {
     pub prefix: String,
     pub total: u32,
     pub title: Option<String>,
+    pub info: Option<CollectionInfoRaw>,
     #[serde(default)]
     pub uncategorized: Vec<String>,
     #[serde(default)]

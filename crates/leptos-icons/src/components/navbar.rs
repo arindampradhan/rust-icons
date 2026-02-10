@@ -1,6 +1,7 @@
 use leptos::prelude::*;
 
 #[component]
+#[allow(dead_code)]
 pub fn Navbar(
     #[prop(optional, into)] back_href: Option<String>,
     #[prop(optional, into)] title: Option<String>,
