@@ -624,6 +624,13 @@ h6 {
     background: rgba(0, 0, 0, 0);
     z-index: 40;
     pointer-events: none;
+    transition: background 0.3s;
+}
+
+.drawer-overlay.open {
+    background: rgba(0, 0, 0, 0.15);
+    pointer-events: auto;
+    cursor: pointer;
 }
 
 .drawer {
@@ -635,7 +642,7 @@ h6 {
     border-top: 4px solid var(--stroke-black);
     box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.1);
     z-index: 50;
-    height: 400px;
+    height: 420px;
     display: flex;
     flex-direction: column;
     transform: translateY(100%);
@@ -652,23 +659,16 @@ h6 {
     transform: translateY(0);
 }
 
-.drawer-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem;
-    border-bottom: 1px solid #e5e7eb;
-    background: var(--newsprint-bg);
-}
-
 .drawer-content {
     flex: 1;
     display: flex;
     overflow: hidden;
+    height: 100%;
 }
 
 .drawer-preview {
     width: 33%;
+    min-width: 200px;
     background: var(--paper-bg);
     border-right: 1px solid #e5e7eb;
     display: flex;
@@ -684,10 +684,171 @@ h6 {
     height: 180px;
 }
 
+.drawer-preview-label {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    font-weight: 700;
+    background: white;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--stroke-black);
+}
+
+.drawer-preview-svg {
+    transform: scale(2);
+}
+
+.drawer-preview-svg svg {
+    width: 48px;
+    height: 48px;
+}
+
 .drawer-details {
     flex: 1;
-    padding: 2rem;
+    padding: 1.5rem 2rem;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.drawer-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.drawer-icon-name {
+    font-size: 1.875rem;
+    font-weight: 900;
+    font-family: var(--font-serif);
+}
+
+.drawer-close-btn {
+    padding: 0.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.drawer-close-btn:hover {
+    background: #e5e7eb;
+}
+
+.drawer-sections {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.drawer-section-title {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-bottom: 1px solid var(--stroke-black);
+    margin-bottom: 1rem;
+    padding-bottom: 0.25rem;
+}
+
+.drawer-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.drawer-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.drawer-btn-primary {
+    background: var(--stroke-black);
+    color: white;
+    border: 1px solid var(--stroke-black);
+}
+
+.drawer-btn-primary:hover {
+    background: var(--interaction);
+    border-color: var(--interaction);
+}
+
+.drawer-btn-outline {
+    background: white;
+    color: var(--ink-black);
+    border: 1px solid var(--stroke-black);
+}
+
+.drawer-btn-outline:hover {
+    background: #f9fafb;
+}
+
+.drawer-snippets-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.drawer-code-block {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 0.75rem;
+    background: #f9fafb;
+    padding: 0.75rem;
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.drawer-code-block:hover {
+    border-color: var(--stroke-black);
+}
+
+.drawer-code-hint {
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin-top: 0.25rem;
+}
+
+.drawer-links {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.drawer-link-btn {
+    padding: 0.25rem 0.75rem;
+    border: 1px solid #d1d5db;
+    font-size: 0.75rem;
+    font-family: var(--font-sans);
+    transition: border-color 0.2s, color 0.2s;
+}
+
+.drawer-link-btn:hover {
+    border-color: var(--stroke-black);
+    color: var(--ink-black);
 }
 
 /* ── Utilities ───────────────────────────────── */

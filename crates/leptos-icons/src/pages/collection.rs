@@ -183,6 +183,10 @@ pub fn CollectionPage() -> impl IntoView {
                                         let p = prefix_for_drawer.clone();
 
                                         view! {
+                                            <div
+                                                class=format!("drawer-overlay {}", if is_open { "open" } else { "" })
+                                                on:click=move |_| set_selected_icon.set(None)
+                                            />
                                             <div class=format!("drawer {}", if is_open { "open" } else { "" })>
                                                 <Show when=move || is_open>
                                                     <IconDetail
