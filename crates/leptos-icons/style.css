@@ -357,6 +357,78 @@ h6 {
     gap: 0.5rem;
 }
 
+.sidebar-back-btn {
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.sidebar-back-btn:hover {
+    background: var(--stroke-black);
+    color: white;
+}
+
+.sidebar-title {
+    font-family: var(--font-serif);
+    font-weight: 700;
+    font-size: 1.25rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sidebar-search {
+    padding: 1rem;
+    border-bottom: 1px solid var(--stroke-black);
+    background: white;
+}
+
+.sidebar-search-inner {
+    position: relative;
+}
+
+.sidebar-search-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    pointer-events: none;
+}
+
+.sidebar-search-input {
+    width: 100%;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    padding: 0.5rem 0.5rem 0.5rem 2.25rem;
+    font-size: 0.875rem;
+    font-family: var(--font-sans);
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.sidebar-search-input:focus {
+    border-color: var(--stroke-black);
+}
+
+.sidebar-link.active {
+    font-weight: 700;
+    background: var(--stroke-black);
+    color: white;
+}
+
+.sidebar-footer {
+    padding: 1rem;
+    border-top: 1px solid var(--stroke-black);
+    font-size: 0.75rem;
+    font-family: var(--font-sans);
+    text-align: center;
+    color: var(--subtext);
+}
+
 .sidebar-nav {
     flex: 1;
     overflow-y: auto;
@@ -393,6 +465,28 @@ h6 {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.collection-title-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.collection-title {
+    font-size: 1.5rem;
+    font-weight: 900;
+    font-family: var(--font-serif);
+}
+
+.collection-subtitle {
+    font-size: 0.75rem;
+    color: var(--subtext);
+    font-family: var(--font-sans);
+    margin-top: 0.25rem;
+}
+
+.collection-search-wrapper {
+    width: 16rem;
 }
 
 .variant-chips {
@@ -445,6 +539,19 @@ h6 {
     color: #e5e7eb; /* Gray 200 */
 }
 
+.letter-separator {
+    height: 1px;
+    flex: 1;
+    background: #e5e7eb;
+}
+
+.letter-count {
+    font-size: 0.75rem;
+    font-family: var(--font-sans);
+    color: #9ca3af;
+    font-weight: 700;
+}
+
 .icons-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
@@ -480,7 +587,18 @@ h6 {
 }
 
 .icon-item:hover .icon-preview-box {
-    border-color: var(--subtext);
+    background: #1f2937;
+    border-color: #4b5563;
+    color: white;
+}
+
+.icon-item:hover .icon-preview-box img {
+    filter: invert(1);
+}
+
+.icon-info {
+    width: 100%;
+    text-align: left;
 }
 
 .icon-name {

@@ -26,30 +26,30 @@ pub fn CollectionPage() -> impl IntoView {
             // ── Sidebar ──────────────────────────────────────
             <aside class="sidebar">
                 <div class="sidebar-header">
-                    <a href="/" class="p-2 hover:bg-black hover:text-white rounded-full transition-colors flex items-center justify-center" title="Back to Home">
+                    <a href="/" class="sidebar-back-btn" title="Back to Home">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="19" y1="12" x2="5" y2="12"></line>
                             <polyline points="12 19 5 12 12 5"></polyline>
                         </svg>
                     </a>
-                    <h1 class="font-serif font-bold text-xl truncate">{initial_id.clone()}</h1>
+                    <h1 class="sidebar-title">{initial_id.clone()}</h1>
                 </div>
 
-                <div class="p-4 border-b border-black bg-white">
-                    <div class="relative">
-                        <div class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                <div class="sidebar-search">
+                    <div class="sidebar-search-inner">
+                        <div class="sidebar-search-icon">
                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                         </div>
                         <input
                            type="text"
                            placeholder="Search collections..."
-                           class="w-full bg-gray-50 border border-gray-200 py-2 pl-9 pr-2 text-sm focus:outline-none focus:border-black font-sans"
+                           class="sidebar-search-input"
                         />
                     </div>
                 </div>
 
                 <div class="sidebar-nav">
-                    <div class="sidebar-link font-bold bg-black text-white">"All Icons"</div>
+                    <div class="sidebar-link active">"All Icons"</div>
                     <div class="sidebar-link">"Material Symbols"</div>
                     <div class="sidebar-link">"Google Material"</div>
                     <div class="sidebar-link">"Carbon"</div>
@@ -57,7 +57,7 @@ pub fn CollectionPage() -> impl IntoView {
                     <div class="sidebar-link">"Remix"</div>
                 </div>
 
-                <div class="p-4 border-t border-black text-xs font-sans text-center text-gray-500">
+                <div class="sidebar-footer">
                     "© 2026 Rust Icons"
                 </div>
             </aside>
@@ -100,23 +100,19 @@ pub fn CollectionPage() -> impl IntoView {
 
                                 view! {
                                     <header class="collection-detail-header">
-                                        <div class="flex flex-col">
-                                            <div class="flex items-center gap-2">
-                                                <h2 class="text-2xl font-black font-serif">{prefix.clone()}</h2>
-                                            </div>
-                                            <div class="text-xs text-gray-500 font-sans mt-1">
+                                        <div class="collection-title-group">
+                                            <h2 class="collection-title">{prefix.clone()}</h2>
+                                            <div class="collection-subtitle">
                                                 {format!("{} icons", total)}
                                             </div>
                                         </div>
 
-                                        <div class="flex items-center gap-4">
-                                            <div class="relative w-64">
-                                                <SearchBar
-                                                    value=search
-                                                    set_value=set_search
-                                                    placeholder="Search icons..."
-                                                />
-                                            </div>
+                                        <div class="collection-search-wrapper">
+                                            <SearchBar
+                                                value=search
+                                                set_value=set_search
+                                                placeholder="Search icons..."
+                                            />
                                         </div>
                                     </header>
 
@@ -137,8 +133,8 @@ pub fn CollectionPage() -> impl IntoView {
                                             <div class="letter-group">
                                                 <div class="letter-header">
                                                     <h3 class="letter-title">{group.0.clone()}</h3>
-                                                    <div class="h-[1px] flex-1 bg-gray-200"></div>
-                                                    <span class="text-xs font-sans text-gray-400 font-bold">
+                                                    <div class="letter-separator"></div>
+                                                    <span class="letter-count">
                                                         {format!("{} ICONS", group.1.len())}
                                                     </span>
                                                 </div>
@@ -159,13 +155,13 @@ pub fn CollectionPage() -> impl IntoView {
 
                                                                     view! {
                                                                         <button
-                                                                            class="icon-item group"
+                                                                            class="icon-item"
                                                                             on:click=move |_| set_selected_icon.set(Some(name_clone.clone()))
                                                                         >
-                                                                            <div class="icon-preview-box group-hover:bg-gray-800 group-hover:border-gray-600 group-hover:text-white transition-colors">
+                                                                            <div class="icon-preview-box">
                                                                                 <img src=img_url alt=icon_name.clone() loading="lazy" width="32" height="32" />
                                                                             </div>
-                                                                            <div class="w-full text-left">
+                                                                            <div class="icon-info">
                                                                                 <div class="icon-name" title=icon_name.clone()>{icon_name.clone()}</div>
                                                                                 <div class="icon-meta">"SVG"</div>
                                                                             </div>
