@@ -77,6 +77,7 @@ h6 {
 
 .tracking-widest {
     letter-spacing: 0.1em;
+    font-size: 10px;
 }
 
 /* ── Layout ──────────────────────────────────── */
@@ -168,10 +169,23 @@ h6 {
 .nav-item {
     cursor: pointer;
     white-space: nowrap;
+    border: none;
+    background: none;
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    padding: 0.25rem 0.5rem;
+    border-radius: 2px;
 }
 
 .nav-item:hover {
     text-decoration: underline;
+}
+
+.nav-item.active {
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 4px;
 }
 
 /* ── Search Bar ──────────────────────────────── */
@@ -312,10 +326,17 @@ h6 {
     background-size: 10px 10px;
 }
 
-.card-preview img {
+.preview-samples {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    z-index: 1;
+}
+
+.preview-samples img {
     width: 32px;
     height: 32px;
-    z-index: 1;
 }
 
 .card-footer {
@@ -441,15 +462,33 @@ h6 {
 }
 
 .sidebar-link {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
     padding: 0.5rem 0.75rem;
     font-family: var(--font-sans);
     font-size: 0.875rem;
     cursor: pointer;
+    border: none;
+    background: none;
+    text-align: left;
+    color: inherit;
+    border-radius: 4px;
 }
 
 .sidebar-link:hover {
     background: var(--gray-accent);
+}
+
+.sidebar-link-count {
+    font-size: 0.75rem;
+    color: var(--subtext);
+    font-variant-numeric: tabular-nums;
+}
+
+.sidebar-link.active .sidebar-link-count {
+    color: rgba(255, 255, 255, 0.7);
 }
 
 .main-content {
@@ -803,7 +842,9 @@ h6 {
     cursor: pointer;
     text-decoration: none;
     display: inline-block;
-    transition: background-color 0.15s, border-color 0.15s;
+    transition:
+        background-color 0.15s,
+        border-color 0.15s;
 }
 
 .drawer-pill:hover {

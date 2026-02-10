@@ -23,6 +23,9 @@ pub fn CollectionPage() -> impl IntoView {
 
     let (search, set_search) = signal(String::new());
     let (selected_icon, set_selected_icon) = signal(None::<String>);
+    let (selected_category, set_selected_category) = signal(None::<String>);
+    let (sidebar_categories, set_sidebar_categories) = signal(Vec::<(String, usize)>::new());
+    let (total_icons_count, set_total_icons_count) = signal(0usize);
 
     view! {
         <div class="collection-layout">
@@ -52,12 +55,40 @@ pub fn CollectionPage() -> impl IntoView {
                 </div>
 
                 <div class="sidebar-nav">
-                    <div class="sidebar-link active">"All Icons"</div>
-                    <div class="sidebar-link">"Material Symbols"</div>
-                    <div class="sidebar-link">"Google Material"</div>
-                    <div class="sidebar-link">"Carbon"</div>
-                    <div class="sidebar-link">"Phosphor"</div>
-                    <div class="sidebar-link">"Remix"</div>
+                    <button
+                        class=move || if selected_category.get().is_none() { "sidebar-link active" } else { "sidebar-link" }
+                        on:click=move |_| set_selected_category.set(None)
+                    >
+                        <span>"All"</span>
+                        <span class="sidebar-link-count">{move || total_icons_count.get()}</span>
+                    </button>
+                    <For
+                        each=move || sidebar_categories.get()
+                        key=|(name, _)| name.clone()
+                        let:cat
+                    >
+                        {
+                            let cat_name = cat.0.clone();
+                            let cat_name_click = cat.0.clone();
+                            let cat_name_class = cat.0.clone();
+                            let count = cat.1;
+                            view! {
+                                <button
+                                    class=move || {
+                                        if selected_category.get().as_deref() == Some(&cat_name_class) {
+                                            "sidebar-link active"
+                                        } else {
+                                            "sidebar-link"
+                                        }
+                                    }
+                                    on:click=move |_| set_selected_category.set(Some(cat_name_click.clone()))
+                                >
+                                    <span>{cat_name}</span>
+                                    <span class="sidebar-link-count">{count}</span>
+                                </button>
+                            }
+                        }
+                    </For>
                 </div>
 
                 <div class="sidebar-footer">
@@ -96,9 +127,40 @@ pub fn CollectionPage() -> impl IntoView {
                                 ].into_iter().flatten().collect();
                                 let meta_line = meta_parts.join(" · ");
 
-                                // Reactive search
+                                // Populate sidebar categories
+                                set_total_icons_count.set(total);
+                                let mut cats: Vec<(String, usize)> = resp.categories.iter()
+                                    .map(|(name, icons)| (name.clone(), icons.len()))
+                                    .collect();
+                                cats.sort_by(|a, b| a.0.cmp(&b.0));
+                                if !resp.uncategorized.is_empty() {
+                                    cats.push(("Uncategorized".to_string(), resp.uncategorized.len()));
+                                }
+                                set_sidebar_categories.set(cats);
+
+                                // Clone categories map for filtering
+                                let categories_map = resp.categories.clone();
+                                let uncategorized = resp.uncategorized.clone();
+
+                                // Reactive search + category filter
                                 let filtered_icons = Signal::derive(move || {
-                                    search_icons(&all_icons, &search.get())
+                                    let search_results = search_icons(&all_icons, &search.get());
+                                    match selected_category.get() {
+                                        None => search_results,
+                                        Some(cat) => {
+                                            if cat == "Uncategorized" {
+                                                search_results.into_iter()
+                                                    .filter(|name| uncategorized.contains(name))
+                                                    .collect()
+                                            } else if let Some(cat_icons) = categories_map.get(&cat) {
+                                                search_results.into_iter()
+                                                    .filter(|name| cat_icons.contains(name))
+                                                    .collect()
+                                            } else {
+                                                search_results
+                                            }
+                                        }
+                                    }
                                 });
 
                                 // Group icons by first letter
@@ -107,11 +169,16 @@ pub fn CollectionPage() -> impl IntoView {
                                     let mut groups: Vec<(String, Vec<String>)> = Vec::new();
 
                                     for icon in icons {
-                                        let first_char = icon.chars().next().unwrap_or('?').to_uppercase().to_string();
-                                        if let Some(group) = groups.iter_mut().find(|(key, _)| key == &first_char) {
+                                        let first_char = icon.chars().next().unwrap_or('?');
+                                        let group_key = if first_char.is_ascii_digit() {
+                                            "#".to_string()
+                                        } else {
+                                            first_char.to_uppercase().to_string()
+                                        };
+                                        if let Some(group) = groups.iter_mut().find(|(key, _)| key == &group_key) {
                                             group.1.push(icon);
                                         } else {
-                                            groups.push((first_char, vec![icon]));
+                                            groups.push((group_key, vec![icon]));
                                         }
                                     }
                                     groups.sort_by(|a, b| a.0.cmp(&b.0));

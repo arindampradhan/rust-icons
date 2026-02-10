@@ -13,31 +13,42 @@ pub fn CollectionCard(collection: CollectionInfo) -> impl IntoView {
         .and_then(|l| l.spdx.clone())
         .unwrap_or_else(|| "Unknown".to_string());
 
+    let author_name = collection
+        .author
+        .as_ref()
+        .map(|a| a.name.clone())
+        .unwrap_or_default();
+
     let CollectionInfo {
         id, name, total, ..
     } = collection;
 
-    // Use the first sample icon for the preview, or a default if none
-    let preview_url = iconify_img_url(
-        &id,
-        &collection.samples.first().cloned().unwrap_or_default(),
-    );
+    let sample_urls: Vec<String> = collection
+        .samples
+        .iter()
+        .take(3)
+        .map(|s| iconify_img_url(&id, s))
+        .collect();
 
     view! {
         <a href=href class="icon-card group">
             <div class="card-header">
                 <h3 class="card-title">{name}</h3>
-                <div class="card-badge">"SVG"</div>
+                <div class="card-badge">{license_spdx}</div>
             </div>
 
             <div class="card-preview">
                 <div class="preview-pattern"></div>
-                <img src=preview_url alt=id.clone() loading="lazy" />
+                <div class="preview-samples">
+                    {sample_urls.into_iter().map(|url| {
+                        view! { <img src=url alt="" loading="lazy" /> }
+                    }).collect_view()}
+                </div>
             </div>
 
             <div class="card-footer">
                 <span>{total} " icons"</span>
-                <span class="uppercase tracking-widest">{license_spdx}</span>
+                <span class="tracking-widest">{author_name}</span>
             </div>
         </a>
     }
