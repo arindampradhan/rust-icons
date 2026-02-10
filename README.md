@@ -4,9 +4,17 @@ Icon Explorer with instant search, powered by [Iconify](https://iconify.design/)
 
 ## Screenshots
 
-| Search & browse | Icon detail & copy | Icon bag |
-|-----------------|--------------------|----------|
-| ![Search](docs/1.png) | ![Detail](docs/2.png) | ![Bag](docs/3.png) |
+**Search & browse**
+
+![Search](docs/1.png)
+
+**Icon detail & copy**
+
+![Detail](docs/2.png)
+
+**Icon bag**
+
+![Bag](docs/3.png)
 
 ## Features
 
