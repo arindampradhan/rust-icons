@@ -206,13 +206,37 @@ pub fn CollectionPage() -> impl IntoView {
                                         </div>
                                     </header>
 
-                                    <div class="variant-chips">
-                                        <button class="variant-chip">"Outlined"</button>
-                                        <button class="variant-chip">"Filled"</button>
-                                        <button class="variant-chip">"Rounded"</button>
-                                        <button class="variant-chip">"Sharp"</button>
-                                        <button class="variant-chip">"Two Tone"</button>
-                                    </div>
+                                    <Show when=move || !sidebar_categories.get().is_empty()>
+                                        <div class="variant-chips">
+                                            <button
+                                                class=move || if selected_category.get().is_none() { "variant-chip active" } else { "variant-chip" }
+                                                on:click=move |_| set_selected_category.set(None)
+                                            >"All"</button>
+                                            <For
+                                                each=move || sidebar_categories.get()
+                                                key=|(name, _)| name.clone()
+                                                let:cat
+                                            >
+                                                {
+                                                    let cat_name = cat.0.clone();
+                                                    let cat_click = cat.0.clone();
+                                                    let cat_class = cat.0.clone();
+                                                    view! {
+                                                        <button
+                                                            class=move || {
+                                                                if selected_category.get().as_deref() == Some(&cat_class) {
+                                                                    "variant-chip active"
+                                                                } else {
+                                                                    "variant-chip"
+                                                                }
+                                                            }
+                                                            on:click=move |_| set_selected_category.set(Some(cat_click.clone()))
+                                                        >{cat_name}</button>
+                                                    }
+                                                }
+                                            </For>
+                                        </div>
+                                    </Show>
 
                                     <div class="icons-grid-section">
                                         <For

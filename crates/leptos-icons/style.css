@@ -540,6 +540,7 @@ h6 {
     display: flex;
     gap: 0.5rem;
     overflow-x: auto;
+    flex-wrap: wrap;
 }
 
 .variant-chip {
@@ -554,6 +555,12 @@ h6 {
 }
 
 .variant-chip:hover {
+    background: var(--stroke-black);
+    color: white;
+    border-color: var(--stroke-black);
+}
+
+.variant-chip.active {
     background: var(--stroke-black);
     color: white;
     border-color: var(--stroke-black);

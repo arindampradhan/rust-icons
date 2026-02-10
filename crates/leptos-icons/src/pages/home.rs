@@ -10,7 +10,6 @@ pub fn HomePage() -> impl IntoView {
     let collections = LocalResource::new(api::fetch_collections);
     let (search, set_search) = signal(String::new());
     let (active_filter, set_active_filter) = signal(None::<String>);
-    let (nav_categories, set_nav_categories) = signal(Vec::<String>::new());
 
     view! {
         <div class="page-container">
@@ -40,32 +39,32 @@ pub fn HomePage() -> impl IntoView {
                     </div>
 
                     <nav class="masthead-nav">
-                        <button
-                            class=move || if active_filter.get().is_none() { "nav-item active" } else { "nav-item" }
-                            on:click=move |_| set_active_filter.set(None)
-                        >"All"</button>
-                        <For
-                            each=move || nav_categories.get()
-                            key=|cat| cat.clone()
-                            let:cat
-                        >
-                            {
-                                let cat_click = cat.clone();
-                                let cat_class = cat.clone();
+                        {
+                            let filters: Vec<(&str, Option<&str>)> = vec![
+                                ("All", None),
+                                ("Material", Some("Material")),
+                                ("UI 24px", Some("UI 24px")),
+                                ("Logos", Some("Logos")),
+                                ("Emoji", Some("Emoji")),
+                                ("Thematic", Some("Thematic")),
+                            ];
+                            filters.into_iter().map(|(label, cat)| {
+                                let cat_value = cat.map(String::from);
+                                let cat_for_class = cat_value.clone();
                                 view! {
                                     <button
                                         class=move || {
-                                            if active_filter.get().as_deref() == Some(&cat_class) {
+                                            if active_filter.get() == cat_for_class {
                                                 "nav-item active"
                                             } else {
                                                 "nav-item"
                                             }
                                         }
-                                        on:click=move |_| set_active_filter.set(Some(cat_click.clone()))
-                                    >{cat}</button>
+                                        on:click=move |_| set_active_filter.set(cat_value.clone())
+                                    >{label}</button>
                                 }
-                            }
-                        </For>
+                            }).collect_view()
+                        }
                     </nav>
                 </header>
 
@@ -75,16 +74,6 @@ pub fn HomePage() -> impl IntoView {
                         {move || Suspend::new(async move {
                             match collections.await {
                                 Ok(all_collections) => {
-                                    // Extract distinct categories for nav tabs
-                                    let mut cats: Vec<String> = all_collections
-                                        .iter()
-                                        .map(|c| c.category.clone())
-                                        .collect::<std::collections::HashSet<_>>()
-                                        .into_iter()
-                                        .collect();
-                                    cats.sort();
-                                    set_nav_categories.set(cats);
-
                                     let grouped = Signal::derive(move || {
                                         let filtered: Vec<&CollectionInfo> =
                                             search_collections(&all_collections, &search.get());
