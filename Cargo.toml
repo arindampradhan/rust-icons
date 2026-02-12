@@ -4,6 +4,7 @@ members = ["crates/core", "crates/leptos-icons"]
 
 [workspace.dependencies]
 serde = { version = "1", features = ["derive"] }
+nucleo-matcher = "0.3"
 
 [workspace.lints.clippy]
 pedantic = { level = "warn", priority = -1 }
