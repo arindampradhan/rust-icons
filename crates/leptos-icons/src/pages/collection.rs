@@ -1,16 +1,31 @@
 use leptos::prelude::*;
-use leptos_router::hooks::use_params_map;
+use leptos_router::hooks::{use_navigate, use_params_map};
 use rust_icons_core::search::search_icons;
 use rust_icons_core::svg::iconify_img_url;
+use wasm_bindgen::JsCast;
+use web_sys::UrlSearchParams;
 
 use crate::api;
 use crate::components::icon_detail::IconDetail;
 use crate::components::search_bar::SearchBar;
 use crate::components::theme_toggle::ThemeToggle;
 
+/// Read icon name from URL query parameters
+fn get_icon_from_url() -> Option<String> {
+    if let Some(window) = web_sys::window() {
+        if let Some(location) = window.location().search().ok() {
+            if let Ok(params) = UrlSearchParams::new_with_str(&location) {
+                return params.get("icon");
+            }
+        }
+    }
+    None
+}
+
 #[component]
 pub fn CollectionPage() -> impl IntoView {
     let params = use_params_map();
+    let navigate = use_navigate();
     let initial_id = params.read_untracked().get("id").unwrap_or_default();
     let id = move || params.read().get("id").unwrap_or_default();
 
@@ -23,7 +38,59 @@ pub fn CollectionPage() -> impl IntoView {
     let (sidebar_name, set_sidebar_name) = signal(initial_id.clone());
 
     let (search, set_search) = signal(String::new());
-    let (selected_icon, set_selected_icon) = signal(None::<String>);
+    
+    // Initialize selected_icon from URL if present
+    let initial_icon = get_icon_from_url();
+    let (selected_icon, set_selected_icon) = signal(initial_icon);
+    let (is_updating_url, set_is_updating_url) = signal(false);
+    
+    // Sync selected_icon changes to URL (but not when updating from URL)
+    Effect::new(move || {
+        let icon = selected_icon.get();
+        
+        // Skip if we're currently updating from URL to avoid circular updates
+        if is_updating_url.get_untracked() {
+            return;
+        }
+        
+        let collection_id = id();
+        let current_path = format!("/collection/{}", collection_id);
+        
+        // Check current URL to avoid unnecessary navigation
+        let current_url_icon = get_icon_from_url();
+        if current_url_icon == icon {
+            return; // Already in sync
+        }
+        
+        if let Some(icon_name) = icon {
+            // Encode the icon name for URL
+            let encoded = js_sys::encode_uri_component(&icon_name);
+            let url = format!("{}?icon={}", current_path, encoded);
+            navigate(&url, Default::default());
+        } else {
+            // Remove icon param when closing
+            navigate(&current_path, Default::default());
+        }
+    });
+    
+    // Listen for browser back/forward navigation
+    Effect::new(move || {
+        let set_selected_icon_clone = set_selected_icon.clone();
+        let set_is_updating_url_clone = set_is_updating_url.clone();
+        
+        if let Some(window) = web_sys::window() {
+            let closure = wasm_bindgen::closure::Closure::wrap(Box::new(move |_e: web_sys::Event| {
+                let url_icon = get_icon_from_url();
+                set_is_updating_url_clone.set(true);
+                set_selected_icon_clone.set(url_icon);
+                set_is_updating_url_clone.set(false);
+            }) as Box<dyn FnMut(_)>);
+            
+            window.add_event_listener_with_callback("popstate", closure.as_ref().unchecked_ref()).ok();
+            closure.forget(); // Keep the closure alive
+        }
+    });
+    
     let (selected_category, set_selected_category) = signal(None::<String>);
     let (sidebar_categories, set_sidebar_categories) = signal(Vec::<(String, usize)>::new());
     let (total_icons_count, set_total_icons_count) = signal(0usize);
@@ -349,7 +416,9 @@ pub fn CollectionPage() -> impl IntoView {
                                         view! {
                                             <div
                                                 class=format!("drawer-overlay {}", if is_open { "open" } else { "" })
-                                                on:click=move |_| set_selected_icon.set(None)
+                                                on:click=move |_| {
+                                                    set_selected_icon.set(None);
+                                                }
                                             />
                                             <div class=format!("drawer {}", if is_open { "open" } else { "" })>
                                                 <Show when=move || is_open>
