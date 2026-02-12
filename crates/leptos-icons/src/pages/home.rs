@@ -121,11 +121,13 @@ pub fn HomePage() -> impl IntoView {
 
                                             match (a_is_recent, b_is_recent, a_is_archive, b_is_archive) {
                                                 // Recent always comes first
-                                                (true, false, _, _) => std::cmp::Ordering::Less,
-                                                (false, true, _, _) => std::cmp::Ordering::Greater,
+                                                (true, false, _, _) | (false, false, false, true) => {
+                                                    std::cmp::Ordering::Less
+                                                }
                                                 // Archive/unmaintained goes to end (unless both are archive)
-                                                (false, false, true, false) => std::cmp::Ordering::Greater,
-                                                (false, false, false, true) => std::cmp::Ordering::Less,
+                                                (false, true, _, _) | (false, false, true, false) => {
+                                                    std::cmp::Ordering::Greater
+                                                }
                                                 // Otherwise sort alphabetically
                                                 _ => a.0.cmp(&b.0),
                                             }

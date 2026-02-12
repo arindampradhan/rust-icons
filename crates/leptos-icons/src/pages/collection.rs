@@ -13,7 +13,7 @@ use crate::components::theme_toggle::ThemeToggle;
 /// Read icon name from URL query parameters
 fn get_icon_from_url() -> Option<String> {
     if let Some(window) = web_sys::window() {
-        if let Some(location) = window.location().search().ok() {
+        if let Ok(location) = window.location().search() {
             if let Ok(params) = UrlSearchParams::new_with_str(&location) {
                 return params.get("icon");
             }
@@ -54,7 +54,7 @@ pub fn CollectionPage() -> impl IntoView {
         }
 
         let collection_id = id();
-        let current_path = format!("/collection/{}", collection_id);
+        let current_path = format!("/collection/{collection_id}");
 
         // Check current URL to avoid unnecessary navigation
         let current_url_icon = get_icon_from_url();
@@ -65,18 +65,18 @@ pub fn CollectionPage() -> impl IntoView {
         if let Some(icon_name) = icon {
             // Encode the icon name for URL
             let encoded = js_sys::encode_uri_component(&icon_name);
-            let url = format!("{}?icon={}", current_path, encoded);
-            navigate(&url, Default::default());
+            let url = format!("{current_path}?icon={encoded}");
+            navigate(&url, leptos_router::NavigateOptions::default());
         } else {
             // Remove icon param when closing
-            navigate(&current_path, Default::default());
+            navigate(&current_path, leptos_router::NavigateOptions::default());
         }
     });
 
     // Listen for browser back/forward navigation
     Effect::new(move || {
-        let set_selected_icon_clone = set_selected_icon.clone();
-        let set_is_updating_url_clone = set_is_updating_url.clone();
+        let set_selected_icon_clone = set_selected_icon;
+        let set_is_updating_url_clone = set_is_updating_url;
 
         if let Some(window) = web_sys::window() {
             let closure =
@@ -339,14 +339,14 @@ pub fn CollectionPage() -> impl IntoView {
                                             let groups = grouped_icons.get();
                                             if groups.is_empty() {
                                                 let search_query = search.get();
-                                                if !search_query.is_empty() {
+                                                if search_query.is_empty() {
+                                                    view! { <div></div> }.into_any()
+                                                } else {
                                                     view! {
                                                         <div class="empty-state">
                                                             <p>"No icons found matching \"" {search_query} "\""</p>
                                                         </div>
                                                     }.into_any()
-                                                } else {
-                                                    view! { <div></div> }.into_any()
                                                 }
                                             } else {
                                                 let prefix_for_group = prefix_for_for_clone.clone();
