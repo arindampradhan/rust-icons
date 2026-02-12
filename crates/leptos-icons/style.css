@@ -7,6 +7,41 @@
     padding: 0;
 }
 
+/* ── Theme Transition ─────────────────────────── */
+/* Smooth fade between Morning and Evening editions */
+body,
+.paper-sheet,
+.masthead,
+.masthead-meta,
+.masthead-nav,
+.sidebar,
+.sidebar-header,
+.sidebar-search,
+.sidebar-footer,
+.main-content,
+.collection-detail-header,
+.variant-chips,
+.drawer,
+.drawer-preview,
+.drawer-preview-label,
+.drawer-detail-header,
+.letter-title,
+.letter-separator,
+.section-header,
+.icon-card,
+.card-preview,
+.card-badge,
+.card-footer,
+.icon-preview-box,
+.search-input,
+.sidebar-search-input {
+    transition:
+        background-color 0.35s ease,
+        color 0.35s ease,
+        border-color 0.35s ease,
+        box-shadow 0.35s ease;
+}
+
 body {
     background-color: var(--paper-bg);
     color: var(--ink-black);
@@ -132,8 +167,17 @@ h6 {
     color: var(--subtext);
     cursor: pointer;
     border-radius: 4px;
-    transition: color 0.15s, background 0.15s;
+    transition: color 0.2s, background-color 0.2s;
     text-decoration: none;
+}
+
+/* Theme toggle rotation on the SVG icon */
+.action-btn svg {
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.action-btn:active svg {
+    transform: rotate(45deg) scale(0.85);
 }
 
 .action-btn:hover {
@@ -266,13 +310,19 @@ h6 {
     border: 1px solid var(--border-light);
     background: var(--surface-white);
     padding: 1rem;
-    transition: all 0.2s;
+    transition:
+        background-color 0.35s ease,
+        color 0.35s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
     display: block;
 }
 
 .icon-card:hover {
     box-shadow: 4px 4px 0px 0px var(--stroke-black);
     border-color: var(--stroke-black);
+    transform: translate(-1px, -1px);
 }
 
 .card-header {
@@ -332,6 +382,7 @@ h6 {
 .preview-samples img {
     width: 32px;
     height: 32px;
+    transition: filter 0.35s ease;
 }
 
 .card-footer {
@@ -477,6 +528,9 @@ h6 {
     text-align: left;
     color: inherit;
     border-radius: 4px;
+    transition:
+        background-color 0.15s ease,
+        color 0.15s ease;
 }
 
 .sidebar-link:hover {
@@ -555,6 +609,10 @@ h6 {
     white-space: nowrap;
     background: var(--surface-white);
     color: var(--ink-black);
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease;
 }
 
 .variant-chip:hover {
@@ -624,7 +682,9 @@ h6 {
     border: none;
     text-align: left;
     color: var(--ink-black);
-    transition: background 0.1s;
+    transition:
+        background-color 0.15s ease,
+        color 0.35s ease;
 }
 
 .icon-item:hover {
@@ -639,6 +699,13 @@ h6 {
     justify-content: center;
     border: 1px solid var(--border-muted);
     background: var(--surface-white);
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.icon-preview-box img {
+    transition: filter 0.25s ease;
 }
 
 .icon-item:hover .icon-preview-box {
@@ -737,6 +804,7 @@ h6 {
 .drawer-preview img {
     width: 180px;
     height: 180px;
+    transition: filter 0.35s ease;
 }
 
 .drawer-preview-label {
@@ -819,7 +887,10 @@ h6 {
     border-bottom: none;
     cursor: pointer;
     color: var(--ink-black);
-    transition: background-color 0.15s;
+    transition:
+        background-color 0.15s ease,
+        color 0.15s ease,
+        border-color 0.15s ease;
     position: relative;
     top: 2px;
 }
@@ -856,8 +927,9 @@ h6 {
     text-decoration: none;
     display: inline-block;
     transition:
-        background-color 0.15s,
-        border-color 0.15s;
+        background-color 0.15s ease,
+        color 0.15s ease,
+        border-color 0.15s ease;
 }
 
 .drawer-pill:hover {
