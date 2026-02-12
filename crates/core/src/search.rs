@@ -1,4 +1,6 @@
 use crate::types::CollectionInfo;
+use nucleo_matcher::pattern::{CaseMatching, Normalization, Pattern};
+use nucleo_matcher::{Config, Matcher, Utf32Str};
 
 // ---------------------------------------------------------------------------
 // Aliases — ported from icones/src/data/search-alias.ts
@@ -94,88 +96,23 @@ fn expand_query(query: &str) -> Vec<String> {
 }
 
 // ---------------------------------------------------------------------------
-// Fuzzy scorer
+// Fuzzy scorer — powered by nucleo-matcher
 // ---------------------------------------------------------------------------
 
-const CONSECUTIVE_BONUS: i32 = 4;
-const WORD_BOUNDARY_BONUS: i32 = 8;
-const PREFIX_BONUS: i32 = 12;
-const GAP_PENALTY: i32 = -1;
-const EXACT_MATCH_BONUS: i32 = 20;
-
-/// Score how well `pattern` fuzzy-matches `text`.
+/// Score a query against `text` using nucleo-matcher.
 ///
-/// Returns `None` if not all pattern characters appear sequentially in `text`.
-/// Higher scores indicate better matches.
-fn fuzzy_score(pattern: &str, text: &str) -> Option<i32> {
-    if pattern.is_empty() {
+/// Returns `None` if pattern doesn't match. Higher scores indicate better matches.
+/// Handles multi-word queries automatically through `Pattern::parse`.
+fn fuzzy_score(query: &str, text: &str) -> Option<u32> {
+    if query.is_empty() {
         return Some(0);
     }
 
-    let pattern_lower: Vec<char> = pattern.chars().flat_map(char::to_lowercase).collect();
-    let text_lower: Vec<char> = text.chars().flat_map(char::to_lowercase).collect();
-
-    let mut score: i32 = 0;
-    let mut pi = 0; // pattern index
-    let mut prev_match_idx: Option<usize> = None;
-
-    for (ti, &tc) in text_lower.iter().enumerate() {
-        if pi < pattern_lower.len() && tc == pattern_lower[pi] {
-            // Consecutive match bonus
-            if let Some(prev) = prev_match_idx {
-                if ti == prev + 1 {
-                    score += CONSECUTIVE_BONUS;
-                } else {
-                    // Gap penalty for skipped chars — icon names are short, cast is safe
-                    #[allow(clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
-                    let gap = (ti - prev - 1) as i32;
-                    score += GAP_PENALTY * gap;
-                }
-            }
-
-            // Word-boundary bonus (start of text or after `-` / `_`)
-            if ti == 0 {
-                score += PREFIX_BONUS;
-            } else {
-                let prev_char = text_lower[ti - 1];
-                if prev_char == '-' || prev_char == '_' {
-                    score += WORD_BOUNDARY_BONUS;
-                }
-            }
-
-            prev_match_idx = Some(ti);
-            pi += 1;
-        }
-    }
-
-    if pi == pattern_lower.len() {
-        // Exact match bonus when pattern covers the full text
-        if pattern_lower.len() == text_lower.len() {
-            score += EXACT_MATCH_BONUS;
-        }
-        Some(score)
-    } else {
-        None
-    }
-}
-
-/// Score a multi-word query against `text`.
-///
-/// Splits query on whitespace, requires all words to match, sums scores.
-fn fuzzy_score_multi(query: &str, text: &str) -> Option<i32> {
-    let words: Vec<&str> = query.split_whitespace().collect();
-    if words.is_empty() {
-        return Some(0);
-    }
-
-    let mut total = 0i32;
-    for word in &words {
-        match fuzzy_score(word, text) {
-            Some(s) => total += s,
-            None => return None,
-        }
-    }
-    Some(total)
+    let pattern = Pattern::parse(query, CaseMatching::Ignore, Normalization::Smart);
+    let mut buf = Vec::new();
+    let haystack = Utf32Str::new(text, &mut buf);
+    let mut matcher = Matcher::new(Config::DEFAULT);
+    pattern.score(haystack, &mut matcher)
 }
 
 // ---------------------------------------------------------------------------
@@ -194,12 +131,12 @@ pub fn search_icons(icons: &[String], query: &str) -> Vec<String> {
     let q = query.trim().to_lowercase();
     let candidates = expand_query(&q);
 
-    let mut scored: Vec<(i32, &String)> = icons
+    let mut scored: Vec<(u32, &String)> = icons
         .iter()
         .filter_map(|name| {
             let best = candidates
                 .iter()
-                .filter_map(|c| fuzzy_score_multi(c, name))
+                .filter_map(|c| fuzzy_score(c, name))
                 .max()?;
             Some((best, name))
         })
@@ -225,16 +162,16 @@ pub fn search_collections<'a>(
     let q = query.trim().to_lowercase();
     let candidates = expand_query(&q);
 
-    let mut scored: Vec<(i32, &CollectionInfo)> = collections
+    let mut scored: Vec<(u32, &CollectionInfo)> = collections
         .iter()
         .filter_map(|c| {
             let best = candidates
                 .iter()
                 .filter_map(|cand| {
                     let scores = [
-                        fuzzy_score_multi(cand, &c.name),
-                        fuzzy_score_multi(cand, &c.id),
-                        fuzzy_score_multi(cand, &c.category),
+                        fuzzy_score(cand, &c.name),
+                        fuzzy_score(cand, &c.id),
+                        fuzzy_score(cand, &c.category),
                     ];
                     scores.into_iter().flatten().max()
                 })

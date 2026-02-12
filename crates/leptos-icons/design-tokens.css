@@ -4,13 +4,13 @@
     --newsprint-bg: #fbfbf8;
     --ink-black: #1a1a1a;
     --stroke-black: #000000;
-    
+
     /* Secondary */
     --gray-accent: #e5e7eb;
     --subtext: #4b5563;
     --border-gray: #e5e7eb;
     --interaction: #b91c1c;
-    
+
     /* Typography */
     --font-serif: "Times New Roman", Garamond, serif;
     --font-sans: Arial, Helvetica, sans-serif;
@@ -18,13 +18,56 @@
     /* Spacing & Layout */
     --container-max: 80rem; /* 7xl */
     --spacing-unit: 0.25rem;
-    
+
     /* Shadows */
     --shadow-paper: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    
+
+    /* Surfaces */
+    --surface-white: #ffffff;
+    --surface-light: #f9fafb;
+    --surface-muted: #f3f4f6;
+
+    /* Borders */
+    --border-light: #64646c;
+    --border-muted: #e5e7eb;
+
+    /* Text */
+    --text-muted: #9ca3af;
+    --text-inverted: #ffffff;
+
+    /* Hover states */
+    --hover-bg: #f9fafb;
+    --hover-dark-bg: #1f2937;
+    --hover-dark-border: #4b5563;
+
     /* Existing tokens mapping (for compatibility if needed) */
     --bg: var(--paper-bg);
     --text: var(--ink-black);
     --border: var(--stroke-black);
     --primary: var(--interaction);
+}
+
+/* ── Dark Mode ("Evening Edition") ──────────── */
+html.dark {
+    /* Layered backgrounds: outer → inner should go darker → lighter */
+    --paper-bg: #0f0f12; /* outermost page bg */
+    --newsprint-bg: #18181d; /* paper sheet */
+    --ink-black: #e0ded9; /* primary text */
+    --stroke-black: #3d3d46; /* borders, rules — subtle, not glaring */
+    --gray-accent: #2a2a32;
+    --subtext: #a3a3b0; /* secondary text — must stay readable */
+    --border-gray: #2a2a32;
+    --interaction: #ef4444;
+    --shadow-paper: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+
+    --surface-white: #212126; /* cards, panels, drawer */
+    --surface-light: #282830; /* preview areas, search bg */
+    --surface-muted: #2f2f38; /* badges, muted surfaces */
+    --border-light: #64646c;
+    --border-muted: #2e2e38;
+    --text-muted: #9090a0;
+    --text-inverted: #0f0f12;
+    --hover-bg: #2a2a34;
+    --hover-dark-bg: #32323c;
+    --hover-dark-border: #4a4a56;
 }
