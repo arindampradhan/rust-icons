@@ -115,13 +115,16 @@ pub fn CollectionPage() -> impl IntoView {
             // ── Main Content ─────────────────────────────────
             <main class="main-content">
                 <Suspense fallback=|| view! { <div class="loading">"Loading collection..."</div> }>
-                    {move || Suspend::new(async move {
+                    {move || {
                         let prefix = id();
-                        match icons_resource.await {
+                        let prefix_cloned = prefix.clone();
+                        Suspend::new(async move {
+                            match icons_resource.await {
                             Ok(resp) => {
                                 let icon_names = resp.all_icon_names();
                                 let total = icon_names.len();
                                 let all_icons = icon_names.clone();
+                                let prefix_for_for_clone = prefix_cloned.clone();
 
                                 // Extract collection metadata
                                 let display_name = resp.info.as_ref()
@@ -154,13 +157,15 @@ pub fn CollectionPage() -> impl IntoView {
                                 }
                                 set_sidebar_categories.set(cats);
 
-                                // Clone categories map for filtering
+                                // Clone categories map for filtering - these are stable data
                                 let categories_map = resp.categories.clone();
                                 let uncategorized = resp.uncategorized.clone();
 
-                                // Reactive search + category filter
+                                // Reactive search + category filter - computed value that reacts to search and category changes
                                 let filtered_icons = Signal::derive(move || {
-                                    let search_results = search_icons(&all_icons, &search.get());
+                                    let search_query = search.get();
+                                    let search_results = search_icons(&all_icons, &search_query);
+                                    
                                     match selected_category.get() {
                                         None => search_results,
                                         Some(cat) => {
@@ -179,9 +184,15 @@ pub fn CollectionPage() -> impl IntoView {
                                     }
                                 });
 
-                                // Group icons by first letter
+                                // Group icons by first letter - computed from filtered icons
                                 let grouped_icons = Signal::derive(move || {
                                     let icons = filtered_icons.get();
+                                    
+                                    // Return empty if no icons match
+                                    if icons.is_empty() {
+                                        return Vec::new();
+                                    }
+                                    
                                     let mut groups: Vec<(String, Vec<String>)> = Vec::new();
 
                                     for icon in icons {
@@ -201,8 +212,7 @@ pub fn CollectionPage() -> impl IntoView {
                                     groups
                                 });
 
-                                let prefix_for_grid = prefix.clone();
-                                let prefix_for_drawer = prefix.clone();
+                                let prefix_for_drawer = prefix_cloned.clone();
 
                                 view! {
                                     <header class="collection-detail-header">
@@ -255,55 +265,79 @@ pub fn CollectionPage() -> impl IntoView {
                                     </Show>
 
                                     <div class="icons-grid-section">
-                                        <For
-                                            each=move || grouped_icons.get()
-                                            key=|(letter, _)| letter.clone()
-                                            let:group
-                                        >
-                                            <div class="letter-group">
-                                                <div class="letter-header">
-                                                    <h3 class="letter-title">{group.0.clone()}</h3>
-                                                    <div class="letter-separator"></div>
-                                                    <span class="letter-count">
-                                                        {format!("{} ICONS", group.1.len())}
-                                                    </span>
-                                                </div>
+                                        {move || {
+                                            let groups = grouped_icons.get();
+                                            if groups.is_empty() {
+                                                let search_query = search.get();
+                                                if !search_query.is_empty() {
+                                                    view! {
+                                                        <div class="empty-state">
+                                                            <p>"No icons found matching \"" {search_query} "\""</p>
+                                                        </div>
+                                                    }.into_any()
+                                                } else {
+                                                    view! { <div></div> }.into_any()
+                                                }
+                                            } else {
+                                                let prefix_for_group = prefix_for_for_clone.clone();
+                                                view! {
+                                                    <For
+                                                        each=move || grouped_icons.get()
+                                                        key=|(letter, _)| letter.clone()
+                                                        let:group
+                                                    >
+                                                        {
+                                                            let prefix_for_icons = prefix_for_group.clone();
+                                                            view! {
+                                                                <div class="letter-group">
+                                                                    <div class="letter-header">
+                                                                        <h3 class="letter-title">{group.0.clone()}</h3>
+                                                                        <div class="letter-separator"></div>
+                                                                        <span class="letter-count">
+                                                                            {format!("{} ICONS", group.1.len())}
+                                                                        </span>
+                                                                    </div>
 
-                                                <div class="icons-grid">
-                                                    {
-                                                        let prefix_for_inner = prefix_for_grid.clone();
-                                                        view! {
-                                                            <For
-                                                                each=move || group.1.clone()
-                                                                key=|name| name.clone()
-                                                                let:icon_name
-                                                            >
-                                                                {
-                                                                    let name_clone = icon_name.clone();
-                                                                    let p = prefix_for_inner.clone();
-                                                                    let img_url = iconify_img_url(&p, &icon_name);
+                                                                    <div class="icons-grid">
+                                                                        {
+                                                                            let prefix_for_inner = prefix_for_icons.clone();
+                                                                            view! {
+                                                                                <For
+                                                                                    each=move || group.1.clone()
+                                                                                    key=|name| name.clone()
+                                                                                    let:icon_name
+                                                                                >
+                                                                                    {
+                                                                                        let name_clone = icon_name.clone();
+                                                                                        let p = prefix_for_inner.clone();
+                                                                                        let img_url = iconify_img_url(&p, &icon_name);
 
-                                                                    view! {
-                                                                        <button
-                                                                            class="icon-item"
-                                                                            on:click=move |_| set_selected_icon.set(Some(name_clone.clone()))
-                                                                        >
-                                                                            <div class="icon-preview-box">
-                                                                                <img src=img_url alt=icon_name.clone() loading="lazy" width="32" height="32" />
-                                                                            </div>
-                                                                            <div class="icon-info">
-                                                                                <div class="icon-name" title=icon_name.clone()>{icon_name.clone()}</div>
-                                                                                <div class="icon-meta">"SVG"</div>
-                                                                            </div>
-                                                                        </button>
-                                                                    }
-                                                                }
-                                                            </For>
+                                                                                        view! {
+                                                                                            <button
+                                                                                                class="icon-item"
+                                                                                                on:click=move |_| set_selected_icon.set(Some(name_clone.clone()))
+                                                                                            >
+                                                                                                <div class="icon-preview-box">
+                                                                                                    <img src=img_url alt=icon_name.clone() loading="lazy" width="32" height="32" />
+                                                                                                </div>
+                                                                                                <div class="icon-info">
+                                                                                                    <div class="icon-name" title=icon_name.clone()>{icon_name.clone()}</div>
+                                                                                                    <div class="icon-meta">"SVG"</div>
+                                                                                                </div>
+                                                                                            </button>
+                                                                                        }
+                                                                                    }
+                                                                                </For>
+                                                                            }
+                                                                        }
+                                                                    </div>
+                                                                </div>
+                                                            }
                                                         }
-                                                    }
-                                                </div>
-                                            </div>
-                                        </For>
+                                                    </For>
+                                                }.into_any()
+                                            }
+                                        }}
                                     </div>
 
                                     // ── Drawer ───────────────────────────────────────
@@ -334,7 +368,8 @@ pub fn CollectionPage() -> impl IntoView {
                                 <div class="empty-state">{format!("Failed to load collection: {e}")}</div>
                             }.into_any()
                         }
-                    })}
+                        })
+                    }}
                 </Suspense>
             </main>
         </div>
