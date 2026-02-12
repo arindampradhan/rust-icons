@@ -106,7 +106,29 @@ pub fn HomePage() -> impl IntoView {
                                                 categories.push((c.category.clone(), vec![(*c).clone()]));
                                             }
                                         }
-                                        categories.sort_by(|a, b| a.0.cmp(&b.0));
+                                        
+                                        // Custom sort: prioritize "Recent" first, push "Archive / Unmaintained" to end
+                                        categories.sort_by(|a, b| {
+                                            let a_lower = a.0.to_lowercase();
+                                            let b_lower = b.0.to_lowercase();
+                                            
+                                            let a_is_recent = a_lower == "recent";
+                                            let b_is_recent = b_lower == "recent";
+                                            let a_is_archive = a_lower.contains("archive") || a_lower.contains("unmaintained");
+                                            let b_is_archive = b_lower.contains("archive") || b_lower.contains("unmaintained");
+                                            
+                                            match (a_is_recent, b_is_recent, a_is_archive, b_is_archive) {
+                                                // Recent always comes first
+                                                (true, false, _, _) => std::cmp::Ordering::Less,
+                                                (false, true, _, _) => std::cmp::Ordering::Greater,
+                                                // Archive/unmaintained goes to end (unless both are archive)
+                                                (false, false, true, false) => std::cmp::Ordering::Greater,
+                                                (false, false, false, true) => std::cmp::Ordering::Less,
+                                                // Otherwise sort alphabetically
+                                                _ => a.0.cmp(&b.0),
+                                            }
+                                        });
+                                        
                                         categories
                                     });
 
