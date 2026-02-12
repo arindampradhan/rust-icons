@@ -7,37 +7,6 @@
     padding: 0;
 }
 
-:root {
-    /* Core Palette */
-    --paper-bg: #f1f0e8;
-    --newsprint-bg: #fbfbf8;
-    --ink-black: #1a1a1a;
-    --stroke-black: #000000;
-
-    /* Secondary */
-    --gray-accent: #e5e7eb;
-    --subtext: #4b5563;
-    --border-gray: #e5e7eb;
-    --interaction: #b91c1c;
-
-    /* Typography */
-    --font-serif: "Times New Roman", Garamond, serif;
-    --font-sans: Arial, Helvetica, sans-serif;
-
-    /* Spacing & Layout */
-    --container-max: 80rem; /* 7xl */
-    --spacing-unit: 0.25rem;
-
-    /* Shadows */
-    --shadow-paper: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-
-    /* Existing tokens mapping */
-    --bg: var(--paper-bg);
-    --text: var(--ink-black);
-    --border: var(--stroke-black);
-    --primary: var(--interaction);
-}
-
 body {
     background-color: var(--paper-bg);
     color: var(--ink-black);
@@ -100,8 +69,8 @@ h6 {
     background-color: var(--newsprint-bg);
     box-shadow: var(--shadow-paper);
     min-height: 100vh;
-    border-left: 1px solid rgba(0, 0, 0, 0.1);
-    border-right: 1px solid rgba(0, 0, 0, 0.1);
+    border-left: 1px solid var(--border-muted);
+    border-right: 1px solid var(--border-muted);
     position: relative;
     width: 100%;
 }
@@ -111,7 +80,7 @@ h6 {
     border-bottom: 4px solid var(--stroke-black);
     padding: 1rem 2rem;
     text-align: center;
-    background: #ffffff;
+    background: var(--surface-white);
     position: sticky;
     top: 0;
     z-index: 100;
@@ -294,8 +263,8 @@ h6 {
 }
 
 .icon-card {
-    border: 1px solid #d1d5db;
-    background: #ffffff;
+    border: 1px solid var(--border-light);
+    background: var(--surface-white);
     padding: 1rem;
     transition: all 0.2s;
     display: block;
@@ -327,15 +296,15 @@ h6 {
 .card-badge {
     font-family: var(--font-sans);
     font-size: 0.625rem;
-    background: #f3f4f6;
+    background: var(--surface-muted);
     padding: 0 0.25rem;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--border-muted);
 }
 
 .card-preview {
     aspect-ratio: 16 / 9;
-    background-color: #f9fafb;
-    border: 1px solid #f3f4f6;
+    background-color: var(--surface-light);
+    border: 1px solid var(--surface-muted);
     margin-bottom: 0.75rem;
     display: flex;
     align-items: center;
@@ -372,7 +341,7 @@ h6 {
     font-family: var(--font-sans);
     font-size: 0.75rem;
     color: var(--subtext);
-    border-top: 1px solid #f3f4f6;
+    border-top: 1px solid var(--surface-muted);
     padding-top: 0.5rem;
 }
 
@@ -420,7 +389,7 @@ h6 {
 
 .sidebar-back-btn:hover {
     background: var(--stroke-black);
-    color: white;
+    color: var(--text-inverted);
 }
 
 .sidebar-title {
@@ -435,7 +404,7 @@ h6 {
 .sidebar-search {
     padding: 1rem;
     border-bottom: 1px solid var(--stroke-black);
-    background: white;
+    background: var(--surface-white);
 }
 
 .sidebar-search-inner {
@@ -447,14 +416,14 @@ h6 {
     left: 0.75rem;
     top: 50%;
     transform: translateY(-50%);
-    color: #9ca3af;
+    color: var(--text-muted);
     pointer-events: none;
 }
 
 .sidebar-search-input {
     width: 100%;
-    background: #f9fafb;
-    border: 1px solid #e5e7eb;
+    background: var(--surface-light);
+    border: 1px solid var(--border-muted);
     padding: 0.5rem 0.5rem 0.5rem 2.25rem;
     font-size: 0.875rem;
     font-family: var(--font-sans);
@@ -469,7 +438,7 @@ h6 {
 .sidebar-link.active {
     font-weight: 700;
     background: var(--stroke-black);
-    color: white;
+    color: var(--text-inverted);
 }
 
 .sidebar-footer {
@@ -521,12 +490,12 @@ h6 {
 }
 
 .sidebar-link.active .sidebar-link-count {
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.6);
 }
 
 .main-content {
     flex: 1;
-    background: white;
+    background: var(--surface-white);
     position: relative;
     /* overflow-y: auto; handled by body/window */
 }
@@ -534,7 +503,7 @@ h6 {
 .collection-detail-header {
     position: sticky;
     top: 0;
-    background: rgba(255, 255, 255, 0.95);
+    background: color-mix(in srgb, var(--surface-white) 95%, transparent);
     backdrop-filter: blur(8px);
     border-bottom: 1px solid var(--stroke-black);
     z-index: 10;
@@ -568,7 +537,7 @@ h6 {
 
 .variant-chips {
     padding: 1rem 1.5rem;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--border-muted);
     background: var(--newsprint-bg);
     display: flex;
     gap: 0.5rem;
@@ -578,24 +547,25 @@ h6 {
 
 .variant-chip {
     padding: 0.25rem 1rem;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--border-light);
     border-radius: 9999px;
     font-size: 0.75rem;
     font-family: var(--font-sans);
     cursor: pointer;
     white-space: nowrap;
-    background: white;
+    background: var(--surface-white);
+    color: var(--ink-black);
 }
 
 .variant-chip:hover {
     background: var(--stroke-black);
-    color: white;
+    color: var(--text-inverted);
     border-color: var(--stroke-black);
 }
 
 .variant-chip.active {
     background: var(--stroke-black);
-    color: white;
+    color: var(--text-inverted);
     border-color: var(--stroke-black);
 }
 
@@ -620,19 +590,19 @@ h6 {
     font-size: 2.25rem;
     font-weight: 900;
     font-family: var(--font-serif);
-    color: #e5e7eb; /* Gray 200 */
+    color: var(--border-muted);
 }
 
 .letter-separator {
     height: 1px;
     flex: 1;
-    background: #e5e7eb;
+    background: var(--border-muted);
 }
 
 .letter-count {
     font-size: 0.75rem;
     font-family: var(--font-sans);
-    color: #9ca3af;
+    color: var(--text-muted);
     font-weight: 700;
 }
 
@@ -653,11 +623,12 @@ h6 {
     background: transparent;
     border: none;
     text-align: left;
+    color: var(--ink-black);
     transition: background 0.1s;
 }
 
 .icon-item:hover {
-    background: #f9fafb;
+    background: var(--hover-bg);
 }
 
 .icon-preview-box {
@@ -666,14 +637,14 @@ h6 {
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid #e5e7eb;
-    background: white;
+    border: 1px solid var(--border-muted);
+    background: var(--surface-white);
 }
 
 .icon-item:hover .icon-preview-box {
-    background: #1f2937;
-    border-color: #4b5563;
-    color: white;
+    background: var(--hover-dark-bg);
+    border-color: var(--hover-dark-border);
+    color: var(--text-inverted);
 }
 
 .icon-item:hover .icon-preview-box img {
@@ -722,7 +693,7 @@ h6 {
     bottom: 0;
     left: 0;
     right: 0;
-    background: white;
+    background: var(--surface-white);
     border-top: 4px solid var(--stroke-black);
     box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.1);
     z-index: 50;
@@ -754,7 +725,7 @@ h6 {
     width: 33%;
     min-width: 200px;
     background: var(--paper-bg);
-    border-right: 1px solid #e5e7eb;
+    border-right: 1px solid var(--border-muted);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -775,7 +746,7 @@ h6 {
     font-family: var(--font-sans);
     font-size: 0.75rem;
     font-weight: 700;
-    background: white;
+    background: var(--surface-white);
     padding: 0.25rem 0.5rem;
     border: 1px solid var(--stroke-black);
 }
@@ -802,7 +773,7 @@ h6 {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--border-muted);
     padding-bottom: 0.75rem;
     margin-bottom: 1rem;
 }
@@ -819,6 +790,7 @@ h6 {
     background: none;
     border: none;
     cursor: pointer;
+    color: var(--ink-black);
     border-radius: 9999px;
     display: flex;
     align-items: center;
@@ -827,7 +799,7 @@ h6 {
 }
 
 .drawer-close-btn:hover {
-    background: #e5e7eb;
+    background: var(--border-muted);
 }
 
 .drawer-tabs {
@@ -846,18 +818,19 @@ h6 {
     border: 1px solid transparent;
     border-bottom: none;
     cursor: pointer;
+    color: var(--ink-black);
     transition: background-color 0.15s;
     position: relative;
     top: 2px;
 }
 
 .drawer-tab:hover {
-    background: #f3f4f6;
+    background: var(--surface-muted);
 }
 
 .drawer-tab.active {
     background: var(--stroke-black);
-    color: white;
+    color: var(--text-inverted);
     border-color: var(--stroke-black);
 }
 
@@ -873,11 +846,11 @@ h6 {
 
 .drawer-pill {
     padding: 0.375rem 1rem;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--border-light);
     border-radius: 9999px;
     font-family: var(--font-sans);
     font-size: 0.8125rem;
-    background: white;
+    background: var(--surface-white);
     color: var(--ink-black);
     cursor: pointer;
     text-decoration: none;
@@ -889,7 +862,7 @@ h6 {
 
 .drawer-pill:hover {
     background: var(--stroke-black);
-    color: white;
+    color: var(--text-inverted);
     border-color: var(--stroke-black);
 }
 
@@ -925,7 +898,7 @@ h6 {
     width: 100%;
     background: transparent;
     border: none;
-    border-bottom: 2px solid #e5e7eb;
+    border-bottom: 2px solid var(--border-muted);
     padding: 0.5rem 0;
     font-family: var(--font-serif);
     font-size: 1.125rem;
@@ -948,4 +921,141 @@ h6 {
     font-size: 1.25rem;
     cursor: pointer;
     color: var(--subtext);
+}
+
+/* ── Dark Mode Overrides ────────────────────── */
+
+/* Invert dark SVG images from Iconify so they're visible on dark backgrounds */
+html.dark .preview-samples img {
+    filter: invert(1) brightness(0.85);
+}
+
+html.dark .icon-preview-box img {
+    filter: invert(1) brightness(0.85);
+}
+
+/* In dark mode, hover makes preview box lighter (inverse of light mode behavior) */
+html.dark .icon-item:hover .icon-preview-box {
+    background: var(--surface-muted);
+    border-color: var(--border-light);
+}
+
+html.dark .icon-item:hover .icon-preview-box img {
+    filter: invert(1) brightness(0.9);
+}
+
+/* Drawer preview icon inversion */
+html.dark .drawer-preview img,
+html.dark .drawer-preview svg {
+    filter: invert(1) brightness(0.85);
+}
+
+/* Dot pattern visibility in dark mode */
+html.dark .preview-pattern {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.5) 1px, transparent 1px);
+}
+
+/* Drawer overlay darker in dark mode */
+html.dark .drawer-overlay.open {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+/* Search input text color inheritance */
+html.dark .search-input,
+html.dark .sidebar-search-input,
+html.dark .search-bar input {
+    color: var(--ink-black);
+}
+
+html.dark .search-input::placeholder,
+html.dark .sidebar-search-input::placeholder,
+html.dark .search-bar input::placeholder {
+    color: var(--subtext);
+}
+
+/* ── Active States (need high contrast in dark mode) ── */
+
+/* Variant chips: active and hover use cream-on-dark for clear selection */
+html.dark .variant-chip.active {
+    background: var(--ink-black);
+    color: var(--paper-bg);
+    border-color: var(--ink-black);
+}
+
+html.dark .variant-chip:hover {
+    background: var(--ink-black);
+    color: var(--paper-bg);
+    border-color: var(--ink-black);
+}
+
+/* Sidebar active link */
+html.dark .sidebar-link.active {
+    background: var(--ink-black);
+    color: var(--paper-bg);
+}
+
+html.dark .sidebar-link.active .sidebar-link-count {
+    color: rgba(15, 15, 18, 0.5);
+}
+
+/* Sidebar back button hover */
+html.dark .sidebar-back-btn:hover {
+    background: var(--ink-black);
+    color: var(--paper-bg);
+}
+
+/* Drawer tab active state */
+html.dark .drawer-tab.active {
+    background: var(--ink-black);
+    color: var(--paper-bg);
+    border-color: var(--ink-black);
+}
+
+/* Drawer pill hover */
+html.dark .drawer-pill:hover {
+    background: var(--ink-black);
+    color: var(--paper-bg);
+    border-color: var(--ink-black);
+}
+
+/* ── Tags & Badges ───────────────────────────── */
+
+/* Card badges (license tags) — need visible border + contrast */
+html.dark .card-badge {
+    background: transparent;
+    border-color: var(--border-light);
+    color: var(--subtext);
+}
+
+/* ── Letter Headers ──────────────────────────── */
+
+/* Letter titles ("A", "B", ...) — decorative but visible */
+html.dark .letter-title {
+    color: var(--border-light);
+}
+
+html.dark .letter-separator {
+    background: var(--border-light);
+}
+
+/* ── Card & Box Polish ───────────────────────── */
+
+/* Card hover shadow — use glow instead of offset box in dark mode */
+html.dark .icon-card:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    border-color: var(--border-light);
+}
+
+/* Dot pattern — reduce intensity */
+html.dark .preview-pattern {
+    opacity: 0.05;
+}
+
+/* Masthead search input — subtle border */
+html.dark .search-input {
+    border-color: var(--border-light);
+}
+
+html.dark .search-input:focus {
+    box-shadow: 0 0 0 1px var(--border-light);
 }
