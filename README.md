@@ -1,6 +1,6 @@
 # rust-icons
 
-Icon Explorer with instant search, powered by [Iconify](https://iconify.design/). A Rust port of [Icônes](https://github.com/antfu-collective/icones) that generates components for **Leptos**, **Yew**, and **Dioxus**.
+Icon Explorer with instant search, powered by [Iconify](https://iconify.design/). A site generates components for **Leptos**, **Yew**, and **Dioxus**.
 
 ## Screenshots
 
